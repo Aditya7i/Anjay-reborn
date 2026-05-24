@@ -1,0 +1,6 @@
+{
+  "name": "ANJAY Dashboard",
+  "description": "A hybrid React/PyScript dashboard with glassmorphism, 15 themes, daily journal, to-do list, and Python-powered games and calendar.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

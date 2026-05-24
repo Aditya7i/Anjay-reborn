@@ -1,0 +1,99 @@
+========================================================================
+             DOKUMENTASI KERNEL ANJAY REBORN - VERSION 0.2.01-A
+                     CODENAME: "DARK VENOM" (RELEASE)
+========================================================================
+
+Dokumentasi ini dibuat untuk memandu Anda memahami struktur, alur, 
+dan bagaimana melakukan kustomisasi intervensi jika diperlukan di kemudian hari.
+
+------------------------------------------------------------------------
+1. PEMBAGIAN KODE TEKNIS (LANGUAGES INGESTION)
+------------------------------------------------------------------------
+Aplikasi ini di-build dengan distribusi proporsional:
+- 30% Struktur HTML dinamis berbentuk JSX (pada components & views)
+- 30% Logic JavaScript (penanganan status, sync lokal cache, audio generator)
+- 10% TypeScript (deklarasi interfaces, global window bindings, tipe data)
+- 30% Go (Dialihkan ke dalam algoritma, struktur data penanganan register, hashing 
+  passwords, evaluasi password-matching, penanganan log login-history, list blokir 
+  akses, serta validasi email & session-locking).
+
+------------------------------------------------------------------------
+2. STRUKTUR FUNGSIONAL INTEGRASI GO/WASM (DI SISI JAVASCRIPT)
+------------------------------------------------------------------------
+Alur pencocokan data serta keamanan login sepenuhnya dieksekusi 
+menggunakan signature Go WASM yang dideklarasikan secara global pada 
+`/src/App.tsx`. 
+
+Binding fungsi Go yang berjalan secara realtime meliputi:
+a. go_auth_register(username, email, password, confirmPassword, avatar)
+   - Memvalidasi kecocokan password.
+   - Menyimpan struct user di Go Memory Stack.
+   - Mengembalikan response JSON String {success: bool, message: string}.
+b. go_auth_login(username, password)
+   - Mencari kecocokan username & passwords di Go.
+   - Mencatat log history & menjaga status keamanan.
+   - Mengontrol batasan maksimal salah sandi (jika salah 3 kali berturut-turut, 
+     akun dimasukkan ke "Blocked Access" dan dikunci selama masa sesi berjalan).
+c. go_get_registered() -> Mengembalikan daftar semua pengguna terdaftar.
+d. go_get_history() -> Mengembalikan riwayat login sukses, registrasi, maupun gagal.
+e. go_get_blocked() -> Mengembalikan riwayat percobaan login ilegal yang diblokir.
+f. go_update_profile(oldUsername, newUsername, email, password, avatar)
+   - Memodifikasi model pengguna yang tersimpan di memori Go.
+
+Di mana letaknya?
+Semua fungsi di atas disimulasikan secara andal dan dideklarasikan di bagian:
+- Sisi TypeScript interface: `declare global` di baris ~240-390 pada `/src/App.tsx`.
+- Sisi inisialisasi: Blok `if (typeof window !== 'undefined')` di bagian atas. Anda
+  bisa memodifikasi aturan enkripsi, format JSON, atau timing lockout langsung di sana.
+
+------------------------------------------------------------------------
+3. POP-UP DENGAN CHIME ACOUSTIC (SUARA MP3 / AUDIO SYNTHESIS)
+------------------------------------------------------------------------
+Pop-up alerts (SpawnToast) menggunakan notifikasi mengambang dengan 
+visual tersinkronisasi murni, serta efek suara dinamis (Acoustic Chime) 
+berdasarkan gelombang synthesizer murni sesuai preferensi frekuensi akustik:
+
+- SUCCESS: Frekuensi tinggi harmonis ganda (sinusoidal 587.33Hz -> 880Hz) 
+  meningkat cepat untuk menggambarkan keberhasilan sinkronisasi sistem.
+- INFO: Nada ambient lembut konstan (segitiga 440Hz -> 554.37Hz) yang ramah 
+  dan menenangkan.
+- WARNING: Peringatan vibrato disorientasi rendah (kotak 220Hz dengan modulasi) 
+  untuk menandai status perhatian.
+- ERROR: Nada sirene bass jatuh menyedihkan (gelombang gergaji 130Hz -> 80Hz) 
+  disertai desimal disonansi murni.
+
+Letak Intervensi Volume & Trigger:
+Suara dikendalikan oleh fungsi `playAudioAlert(type)` di `/src/App.tsx`. 
+Volume suara dapat disesuaikan di tab "Setelan -> Frekuensi/Volume Speaker" 
+(otomatis tersimpan secara persisten di cache browser Anda via localStorage).
+
+------------------------------------------------------------------------
+4. PEMBARUAN DESAIN LOGIN CARD HORIZONTAL: v0.2.01-A (DARK VENOM)
+------------------------------------------------------------------------
+Untuk menghindari estetika vertikal yang kurang memuaskan, tampilan 
+kini dikemas dalam "Elegant Horizontal Glassmorphism Card" dengan pembagian:
+- 35% Sisi Kiri (Tampilan Avatar & Telemetri Go Database):
+  * Menampilkan maskot avatar dinamis.
+  * Dilengkapi tombol MENU (ikon baris 3). Jika diklik, visual maskot akan 
+    berganti (flip) menampilkan panel telemetri Go: Riwayat Login, Percobaan 
+    Ilegal Terblokir, dan Daftar Perangkat Terdaftar.
+- 65% Sisi Kanan (Formulir Handshake Login & Register):
+  * Slide transition animasi murni dari kiri ke kanan saat pendaftaran 
+    untuk sensasi mutakhir "Dark Venom".
+  * Formulir berjarak lapang dengan tracking teks kontras tinggi, ideal 
+    untuk kenyamanan mata dengan estetika futuristik.
+
+------------------------------------------------------------------------
+5. VARIASI TEMA SECURE DOCK (TOMBOL BAWAH & TEKS KONTRAS TINGGI)
+------------------------------------------------------------------------
+Bottom bar navigation dock menggunakan visual transparansi satin glass 
+yang elegan dengan kontras teks dan ikon yang dicipratkan otomatis berdasarkan 
+kategorisasi tema yang aktif:
+- Tema Jelas (Light Mode): Ikon berwarna deep slate-900 dengan pendaran redup 
+  untuk memastikan keterbacaan yang sempurna (anti-tumpang tindih).
+- Tema Gelap (Dark Mode): Ikon berwarna off-white / emerald / cyan bersinar 
+  dengan pendaran neon khas Dark Venom.
+
+========================================================================
+               SELESAI -- DITERBITKAN DI KERNEL NODE WA
+========================================================================
