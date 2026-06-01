@@ -27,6 +27,258 @@
         --font-body: 'Inter', sans-serif;
       }
 
+            /* Presets & Gradients themes overrides */
+         body.theme-dk-classic {
+        --app-bg: linear-gradient(135deg, #020617 0%, #090d16 100%); /* Deep space navy */
+        --card-bg: rgba(10, 15, 30, 0.45); /* Transparan liquid glass murni */
+        --card-border: rgba(0, 255, 255, 0.25); /* Neon Cyan border */
+        --text-primary: #ffffff;
+        --accent-glow: #00ffff; /* Tambahan untuk efek drop-shadow/neon nanti */
+      }
+
+      body.theme-dk-emerald {
+        --app-bg: linear-gradient(135deg, #020806 0%, #06110d 100%); /* Deep matrix obsidian */
+        --card-bg: rgba(6, 17, 13, 0.5); 
+        --card-border: rgba(16, 185, 129, 0.25); /* Bright Emerald neon border */
+        --text-primary: #e6fcf5;
+        --accent-glow: #10b981;
+      }
+
+      body.theme-dk-rosered {
+        --app-bg: linear-gradient(135deg, #090103 0%, #150307 100%); /* Deep cyberpunk burgundy */
+        --card-bg: rgba(21, 3, 7, 0.5);
+        --card-border: rgba(244, 63, 94, 0.25); /* Electric Rose Red border */
+        --text-primary: #fff1f2;
+        --accent-glow: #f43f5e;
+      }
+
+      /* 2. LIGHT THEMES (Pastel Soft, Transparansi Frosted Glass, Teks Kontras Tinggi) */
+      body.theme-lt-sakura {
+        --app-bg: linear-gradient(135deg, #fff5f5 0%, #ffe4e6 100%); /* Soft Sakura background */
+        --card-bg: rgba(255, 255, 255, 0.65); /* Frosted glass effect */
+        --card-border: rgba(244, 63, 94, 0.2);
+        --text-primary: #4c0519; /* Teks Rose Tua Indigo (Sangat terbaca di tema pink) */
+        --accent-glow: #f43f5e;
+      }
+
+      body.theme-lt-nordic {
+        --app-bg: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); /* Clean glacial mist background */
+        --card-bg: rgba(255, 255, 255, 0.65);
+        --card-border: rgba(14, 165, 233, 0.2);
+        --text-primary: #032b43; /* Deep oceanic blue text */
+        --accent-glow: #0ea5e9;
+      }
+
+      body.theme-lt-rosered {
+        --app-bg: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+        --card-bg: rgba(255, 255, 255, 0.7);
+        --card-border: rgba(225, 29, 72, 0.25);
+        --text-primary: #4c0519; /* Kontras tinggi merah gelap agar navigasi tajam */
+        --accent-glow: #e11d48;
+      }
+
+      /* Global background gradient effect */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -10;
+        opacity: 0.15;
+        pointer-events: none;
+        transition: background 0.5s ease;
+      }
+      body.theme-dk-classic::before {
+        background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.35), transparent 60%);
+        opacity: 0.35;
+      }
+      body.theme-dk-emerald::before {
+        background: radial-gradient(circle at top right, rgba(6, 182, 212, 0.35), transparent 60%);
+        opacity: 0.35;
+      }
+      body.theme-dk-rosered::before {
+        background: radial-gradient(circle at top right, rgba(244, 63, 94, 0.35), transparent 60%);
+        opacity: 0.35;
+      }
+      body.theme-lt-sakura::before {
+        background: linear-gradient(135deg, rgba(254, 205, 211, 0.45) 0%, rgba(254, 237, 222, 0.45) 100%);
+        opacity: 0.85;
+      }
+      body.theme-lt-nordic::before {
+        background: linear-gradient(135deg, rgba(224, 242, 254, 0.45) 0%, rgba(204, 251, 241, 0.45) 100%);
+        opacity: 0.85;
+      }
+      body.theme-lt-rosered::before {
+        background: linear-gradient(135deg, rgba(254, 205, 211, 0.45) 0%, rgba(254, 243, 244, 0.45) 100%);
+        opacity: 0.85;
+      }
+
+      /* Unified & Highly Polished Light Mode Overrides */
+      body[class*="theme-lt-"] {
+        background-color: var(--app-bg);
+        color: var(--text-primary);
+      }
+      body[class*="theme-lt-"] .text-white,
+      body[class*="theme-lt-"] .text-slate-100,
+      body[class*="theme-lt-"] .text-slate-200,
+      body[class*="theme-lt-"] .text-slate-300 {
+        color: var(--text-primary);
+      }
+      body[class*="theme-lt-"] .text-slate-400,
+      body[class*="theme-lt-"] .text-slate-500 {
+        color: #475569;
+      }
+      /* Prevent overriding absolute white texts on buttons and major widgets */
+      body[class*="theme-lt-"] button.text-white,
+      body[class*="theme-lt-"] .btn-glow,
+      body[class*="theme-lt-"] .accent-button,
+      body[class*="theme-lt-"] .bg-blue-600 .text-white,
+      body[class*="theme-lt-"] .bg-rose-500 .text-white,
+      body[class*="theme-lt-"] .bg-emerald-500 .text-white,
+      body[class*="theme-lt-"] .bg-sky-500 .text-white,
+      body[class*="theme-lt-"] .bg-rose-600,
+      body[class*="theme-lt-"] .bg-blue-600,
+      body[class*="theme-lt-"] .bg-rose-500,
+      body[class*="theme-lt-"] .bg-emerald-500,
+      body[class*="theme-lt-"] .bg-amber-500,
+      body[class*="theme-lt-"] .bg-violet-600,
+      body[class*="theme-lt-"] .text-emerald-100,
+      body[class*="theme-lt-"] .text-blue-100,
+      body[class*="theme-lt-"] .text-amber-100,
+      body[class*="theme-lt-"] .text-red-100 {
+        color: #ffffff !important;
+      }
+      body[class*="theme-lt-"] button.text-white * {
+        color: #ffffff !important;
+      }
+      
+      /* Better card contents styling in light mode */
+      body[class*="theme-lt-"] h1,
+      body[class*="theme-lt-"] h2,
+      body[class*="theme-lt-"] h3,
+      body[class*="theme-lt-"] h4 {
+        color: var(--text-primary) !important;
+      }
+      body[class*="theme-lt-"] p {
+        color: #334155 !important;
+      }
+
+      body[class*="theme-lt-"] .glow-border,
+      body[class*="theme-lt-"] .small-card,
+      body[class*="theme-lt-"] .smallmid-card,
+      body[class*="theme-lt-"] .midlarge-card,
+      body[class*="theme-lt-"] .large-card,
+      body[class*="theme-lt-"] .xl-card,
+      body[class*="theme-lt-"] .custom-popup {
+        background-color: var(--card-bg) !important;
+        border-color: var(--card-border) !important;
+        color: var(--text-primary) !important;
+        box-shadow: 0 4px 15px -3px rgba(15, 23, 42, 0.08) !important;
+      }
+
+      body[class*="theme-lt-"] .glow-border:hover,
+      body[class*="theme-lt-"] .small-card:hover,
+      body[class*="theme-lt-"] .smallmid-card:hover,
+      body[class*="theme-lt-"] .midlarge-card:hover,
+      body[class*="theme-lt-"] .large-card:hover,
+      body[class*="theme-lt-"] .xl-card:hover,
+      body[class*="theme-lt-"] .custom-popup:hover {
+        border-color: var(--neon-primary) !important;
+        box-shadow: 0 6px 20px -2px rgba(15, 23, 42, 0.12) !important;
+      }
+
+      /* Float headers / footers in light mode */
+      body[class*="theme-lt-"] header {
+        background-color: rgba(255, 255, 255, 0.8) !important;
+        border-color: var(--card-border) !important;
+        color: var(--text-primary) !important;
+      }
+      body[class*="theme-lt-"] footer {
+        background-color: rgba(255, 255, 255, 0.85) !important;
+        border-color: var(--card-border) !important;
+        box-shadow: 0 4.5px 20px rgba(0, 0, 0, 0.05) !important;
+      }
+      body[class*="theme-lt-"] .nav-item {
+        color: #475569 !important;
+      }
+      body[class*="theme-lt-"] .nav-item:hover,
+      body[class*="theme-lt-"] .nav-item.active {
+        background-color: rgba(15, 23, 42, 0.05) !important;
+        color: var(--neon-primary) !important;
+      }
+
+      /* Dynamic components like fields, selectors and papers in light mode */
+      body[class*="theme-lt-"] input:not([type="color"]),
+      body[class*="theme-lt-"] select,
+      body[class*="theme-lt-"] textarea {
+        background-color: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+      }
+      body[class*="theme-lt-"] input:focus,
+      body[class*="theme-lt-"] select:focus,
+      body[class*="theme-lt-"] textarea:focus {
+        border-color: var(--neon-primary) !important;
+      }
+
+      /* Table rows, items, and containers */
+      body[class*="theme-lt-"] .bg-slate-950,
+      body[class*="theme-lt-"] .bg-slate-900,
+      body[class*="theme-lt-"] .bg-slate-900\/60,
+      body[class*="theme-lt-"] .bg-slate-950\/60,
+      body[class*="theme-lt-"] .bg-slate-950\/20,
+      body[class*="theme-lt-"] .bg-slate-900\/10 {
+        background-color: rgba(15, 23, 42, 0.04) !important;
+        color: var(--text-primary) !important;
+      }
+      body[class*="theme-lt-"] table th {
+        color: #334155 !important;
+        border-color: #e2e8f0 !important;
+      }
+      body[class*="theme-lt-"] table td {
+        color: #475569 !important;
+        border-color: #f1f5f9 !important;
+      }
+      body[class*="theme-lt-"] #main-dashboard {
+        background-color: transparent !important;
+      }
+
+      /* Calendar fixes under light mode */
+      body[class*="theme-lt-"] .calendar-date-cell {
+        background-color: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        color: #1e293b !important;
+      }
+      body[class*="theme-lt-"] .calendar-date-cell:hover {
+        background-color: rgba(15, 23, 42, 0.05) !important;
+        border-color: var(--neon-primary) !important;
+      }
+      body[class*="theme-lt-"] .calendar-date-cell.bg-blue-600\/20 {
+        background-color: var(--neon-primary-glow) !important;
+        color: var(--text-primary) !important;
+        border-color: var(--neon-primary) !important;
+      }
+
+      /* Tic tac toe cells in light mode */
+      body[class*="theme-lt-"] .btn-ttt-cell {
+        background-color: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+      }
+
+      /* Memory and Puzzle grids */
+      body[class*="theme-lt-"] #memory-cards-grid,
+      body[class*="theme-lt-"] #sliding-puzzle-grid {
+        background-color: rgba(15, 23, 42, 0.04) !important;
+        border-color: #cbd5e1 !important;
+      }
+
+      /* Sliding cells cards */
+      body[class*="theme-lt-"] [onclick*="window.slidingCellClickedAction"] {
+        background-color: #ffffff !important;
+        color: var(--text-primary) !important;
+        border-color: #cbd5e1 !important;
+      }
+
       body {
         margin: 0;
         padding: 0;
@@ -62,6 +314,87 @@
         box-shadow: 0 0 20px 0px var(--neon-primary-glow);
       }
 
+      /* Reusable Custom-Categorized Layout Cards of Variable Dimensions */
+      .small-card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 0.75rem; /* rounded-xl */
+        padding: 0.75rem 1rem;
+        box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.12), 0 0 10px -2px var(--neon-primary-glow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .small-card:hover {
+        border-color: var(--neon-primary);
+        box-shadow: 0 4px 18px -1px var(--neon-primary-glow);
+        transform: translateY(-1px);
+      }
+
+      .smallmid-card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 1rem; /* rounded-2xl */
+        padding: 1.25rem;
+        box-shadow: 0 6px 16px -3px rgba(0, 0, 0, 0.15), 0 0 12px -3px var(--neon-primary-glow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .smallmid-card:hover {
+        border-color: var(--neon-primary);
+        box-shadow: 0 6px 22px -1px var(--neon-primary-glow);
+        transform: translateY(-1.5px);
+      }
+
+      .midlarge-card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 1.25rem; 
+        padding: 1.5rem;
+        box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.18), 0 0 15px -4px var(--neon-primary-glow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .midlarge-card:hover {
+        border-color: var(--neon-primary);
+        box-shadow: 0 8px 25px -1px var(--neon-primary-glow);
+        transform: translateY(-2px);
+      }
+
+      .large-card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 1.5rem;
+        padding: 1.75rem;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.22), 0 0 18px -4px var(--neon-primary-glow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .large-card:hover {
+        border-color: var(--neon-primary);
+        box-shadow: 0 12px 30px var(--neon-primary-glow);
+        transform: translateY(-2.5px);
+      }
+
+      .xl-card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 1.75rem;
+        padding: 2.25rem;
+        box-shadow: 0 15px 35px -8px rgba(0, 0, 0, 0.26), 0 0 24px -5px var(--neon-primary-glow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .xl-card:hover {
+        border-color: var(--neon-primary);
+        box-shadow: 0 15px 40px var(--neon-primary-glow);
+        transform: translateY(-3px);
+      }
+
+      .custom-popup {
+        background-color: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 1rem;
+        box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5), 0 0 25px var(--neon-primary-glow);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        transition: all 0.3s ease;
+      }
+
       .text-glow {
         text-shadow: 0 0 8px var(--neon-primary-glow);
       }
@@ -78,6 +411,16 @@
       .btn-glow:hover {
         transform: translateY(-1px);
         box-shadow: 0 0 18px var(--neon-primary);
+      }
+
+      .glow-card-emerald {
+        box-shadow: 0 0 20px 2px var(--neon-secondary-glow) !important;
+        border-color: rgba(16, 185, 129, 0.45) !important;
+      }
+
+      .glow-card-primary {
+        box-shadow: 0 0 20px 2px var(--neon-primary-glow) !important;
+        border-color: rgba(59, 130, 246, 0.45) !important;
       }
 
       /* Ruled / Grid Paper styles for Journal */
@@ -158,7 +501,7 @@
 
     <!-- 2. HANDSHAKE GATEWAY / AUTHENTICATION PAGE (GLASSMORPHISM) -->
     <div id="auth-screen" class="min-h-screen w-full flex items-center justify-center p-4 relative z-10">
-      <div class="w-full max-w-4xl rounded-2xl glow-border bg-slate-900/80 backdrop-blur-xl overflow-hidden grid grid-cols-1 md:grid-cols-12 shadow-2xl relative">
+      <div class="w-full max-w-4xl rounded-2xl xl-card !p-0 overflow-hidden grid grid-cols-1 md:grid-cols-12 shadow-2xl relative">
         
         <!-- Left Side: Avatar, Logo & WASM Database Monitor (35%) -->
         <div class="md:col-span-5 bg-gradient-to-b from-slate-950 to-slate-900 p-8 flex flex-col justify-between border-r border-white/5 relative">
@@ -301,73 +644,48 @@
     </div>
 
     <!-- 3. MAIN DASHBOARD VIEWPORT (INITIAL HIDDEN UNTIL SECURE HANDSHAKE SUCCESS) -->
-    <div id="main-dashboard" class="hidden min-h-screen flex flex-col md:flex-row relative z-10">
+    <div id="main-dashboard" class="hidden min-h-screen flex flex-col relative z-10 bg-slate-950/20">
       
-      <!-- LEFT DESKTOP SIDEBAR / BOTTOM MOBILE NAVIGATION DOCK -->
-      <aside class="w-full md:w-64 bg-slate-950/80 border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-between shrink-0 relative backdrop-blur-xl z-50">
-        
-        <!-- Sidebar top: user status & title -->
-        <div class="p-4 md:p-6 space-y-6">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="text-2xl">🏮</span>
-              <div>
-                <h2 class="font-display font-black text-sm tracking-widest text-slate-50 uppercase text-glow">ANJAY REBORN</h2>
-                <span class="text-[9px] font-mono tracking-widest text-slate-400 uppercase">Go WASM Engine Active</span>
-              </div>
+      <!-- TOP NAVIGATION BAR (HEADERBAR) -->
+      <header class="w-full h-16 bg-slate-950/85 border-b border-white/10 flex items-center justify-between px-4 sm:px-6 md:px-8 shrink-0 sticky top-0 backdrop-blur-xl z-50">
+        <!-- Logo & Title -->
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center font-black text-white text-sm shadow-lg shadow-blue-500/10">G</div>
+          <div>
+            <h2 class="font-display font-black text-xs sm:text-sm tracking-widest text-white uppercase text-glow">ANJAY</h2>
+          </div>
+        </div>
+
+        <!-- Middle & Right: Profile Badge and quick actions -->
+        <div class="flex items-center gap-2 sm:gap-4">
+
+          <!-- Compact Profile Badge inside Header -->
+          <div class="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-xl border border-white/10 text-left max-w-[180px] sm:max-w-[200px]">
+            <span id="user-profile-avatar" class="text-xl sm:text-2xl">🐹</span>
+            <div class="min-w-0 flex-1">
+              <p id="user-profile-name" class="font-bold text-[10px] sm:text-xs text-white truncate">Guest-Node</p>
+              <p id="user-profile-sub" class="text-[8px] font-mono text-emerald-400 capitalize tracking-wider font-semibold">● Tamu</p>
             </div>
-            <!-- Quick speaker configuration popover triggers -->
-            <button id="btn-toggle-speaker" class="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 transition-all text-xs" title="Konfigurasi Frekuensi & Volume Chime Speaker">
+          </div>
+
+          <!-- Quick Controls: Speaker popover and System Time -->
+          <div class="flex items-center gap-2">
+            <!-- Speaker Popover Trigger -->
+            <button id="btn-toggle-speaker" class="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 transition-all text-xs cursor-pointer" title="Konfigurasi Frekuensi & Volume Chime Speaker">
               <i class="fa-solid fa-volume-high"></i>
             </button>
-          </div>
 
-          <!-- Profile Badge -->
-          <div class="p-3 bg-white/5 rounded-xl border border-white/10 flex items-center gap-3">
-            <span id="user-profile-avatar" class="text-3xl">🐹</span>
-            <div class="min-w-0 flex-1">
-              <p id="user-profile-name" class="font-bold text-xs text-white truncate">Guest-Node</p>
-              <p id="user-profile-sub" class="text-[9px] font-mono text-emerald-400 capitalize tracking-wider font-semibold">● Tamu (Guest Mode)</p>
+            <!-- UTC System Time Display (Replacing Signout Button) -->
+            <div class="px-3 py-1.5 bg-slate-900/60 rounded-xl border border-white/10 flex items-center gap-2 text-xs font-mono shadow-inner">
+              <span class="text-blue-400 font-black uppercase tracking-wider hidden sm:inline text-[9px]">SYSTEM TIME (UTC)</span>
+              <span id="dashboard-clock" class="text-emerald-400 font-bold tracking-widest text-[11px] sm:text-xs">00:00:00</span>
             </div>
           </div>
-
-          <!-- Sidebar Tabs Navigation Grid -->
-          <nav class="space-y-1" id="sidebar-nav">
-            <button data-tab="tab-panel-dashboard" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-semibold tracking-wider transition-all text-blue-400 bg-blue-500/10 cursor-pointer">
-              <i class="fa-solid fa-chart-line w-4 text-center"></i> <span>Dashboard Panel</span>
-            </button>
-            <button data-tab="tab-panel-calendar" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-semibold tracking-wider transition-all text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer">
-              <i class="fa-solid fa-calendar-days w-4 text-center"></i> <span>Kalender & Jadwal</span>
-            </button>
-            <button data-tab="tab-panel-diary" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-semibold tracking-wider transition-all text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer">
-              <i class="fa-solid fa-book-open w-4 text-center"></i> <span>Aesthetic Diary</span>
-            </button>
-            <button data-tab="tab-panel-games" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-semibold tracking-wider transition-all text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer">
-              <i class="fa-solid fa-gamepad w-4 text-center"></i> <span>Mini Games WASM</span>
-            </button>
-            <button data-tab="tab-panel-player" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-semibold tracking-wider transition-all text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer">
-              <i class="fa-solid fa-music w-4 text-center"></i> <span>Lo-Fi Music Room</span>
-            </button>
-            <button data-tab="tab-panel-settings" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-semibold tracking-wider transition-all text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer">
-              <i class="fa-solid fa-sliders w-4 text-center"></i> <span>Setelan Ambient</span>
-            </button>
-          </nav>
         </div>
+      </header>
 
-        <!-- Sidebar Footer: Log Out button -->
-        <div class="p-4 border-t border-white/5 space-y-3">
-          <div class="flex items-center justify-between text-[10px] font-mono text-slate-500">
-            <span>UPTIME: <strong id="val-uptime" class="text-blue-500">0s</strong></span>
-            <span>PING: <strong class="text-emerald-500">0.2ms</strong></span>
-          </div>
-          <button id="btn-signout" class="w-full flex items-center justify-center gap-2 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl text-xs font-bold transition-all border border-red-500/25 uppercase tracking-wider cursor-pointer">
-            <i class="fa-solid fa-right-from-bracket"></i> Keluar Handshake
-          </button>
-        </div>
-      </aside>
-
-      <!-- AUDIO SPEAKER OPTIONS CONFIGURATION BOX (Absolute Popover, click-toggled) -->
-      <div id="speaker-set-popover" class="hidden absolute top-16 left-6 z-50 w-72 p-4 rounded-xl glow-border border border-white/10 bg-slate-900/95 backdrop-blur-xl shadow-2xl space-y-4">
+      <!-- AUDIO SPEAKER OPTIONS CONFIGURATION BOX (Absolute Popover, click-toggled, positioned corresponding to top bar button) -->
+      <div id="speaker-set-popover" class="hidden absolute top-16 right-4 sm:right-6 md:right-32 lg:right-40 z-50 w-72 p-4 custom-popup space-y-4">
         <div class="flex items-center justify-between border-b border-white/5 pb-2">
           <h4 class="text-xs font-bold font-mono text-blue-400 capitalize flex items-center gap-1.5"><i class="fa-solid fa-volume-high"></i> Chime Speaker Set</h4>
           <button id="btn-close-speaker-popover" class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-white/5 text-slate-400">Tutup</button>
@@ -388,122 +706,299 @@
         </div>
       </div>
 
-      <!-- MAIN CONTENT WRAPPER -->
-      <main class="flex-grow p-4 md:p-8 overflow-y-auto z-10 max-w-7xl mx-auto w-full transition-all">
+      <!-- BOTTOM NAVIGATION BAR (FLOATING DOCK) -->
+      <footer class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-1.5rem)] sm:w-[calc(100%-3rem)] max-w-5xl bg-slate-950/90 border border-white/10 backdrop-blur-xl z-50 shadow-[0_10px_35px_rgba(59,130,246,0.22)] rounded-2xl">
+        <div class="px-3 sm:px-4 py-2 flex items-center justify-between gap-2.5">
+          <!-- Sidebar Tabs Navigation Grid, formatted as a responsive flat row -->
+          <nav class="flex items-center justify-between gap-1 sm:gap-2 flex-grow" id="sidebar-nav">
+            <button data-tab="tab-panel-dashboard" class="nav-item flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-center text-[10px] sm:text-xs font-bold tracking-wider transition-all text-blue-400 bg-blue-500/15 border border-blue-500/10 cursor-pointer text-glow flex-1">
+              <i class="fa-solid fa-table-cells-large text-sm sm:text-xs"></i> 
+              <span class="hidden md:inline">Home</span>
+              <span class="md:hidden text-[9px]">Home</span>
+            </button>
+            <button data-tab="tab-panel-tugas" class="nav-item flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-center text-[10px] sm:text-xs font-bold tracking-wider transition-all text-slate-400 hover:text-white hover:bg-white/5 cursor-pointer flex-1">
+              <i class="fa-solid fa-clipboard-check text-sm sm:text-xs"></i> 
+              <span class="hidden md:inline">Tugas</span>
+              <span class="md:hidden text-[9px]">Tugas</span>
+            </button>
+            <button data-tab="tab-panel-diary" class="nav-item flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-center text-[10px] sm:text-xs font-bold tracking-wider transition-all text-slate-400 hover:text-white hover:bg-white/5 cursor-pointer flex-1">
+              <i class="fa-solid fa-book-open text-sm sm:text-xs"></i> 
+              <span class="hidden md:inline">Jurnal</span>
+              <span class="md:hidden text-[9px]">Jurnal</span>
+            </button>
+            <button data-tab="tab-panel-calendar" class="nav-item flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-center text-[10px] sm:text-xs font-bold tracking-wider transition-all text-slate-400 hover:text-white hover:bg-white/5 cursor-pointer flex-1">
+              <i class="fa-solid fa-calendar-days text-sm sm:text-xs"></i> 
+              <span class="hidden md:inline">Kalender</span>
+              <span class="md:hidden text-[9px]">Kalender</span>
+            </button>
+            <button data-tab="tab-panel-player" class="nav-item flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-center text-[10px] sm:text-xs font-bold tracking-wider transition-all text-slate-400 hover:text-white hover:bg-white/5 cursor-pointer flex-1">
+              <i class="fa-solid fa-music text-sm sm:text-xs"></i> 
+              <span class="hidden md:inline">Musik</span>
+              <span class="md:hidden text-[9px]">Musik</span>
+            </button>
+            <button data-tab="tab-panel-games" class="nav-item flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-center text-[10px] sm:text-xs font-bold tracking-wider transition-all text-slate-400 hover:text-white hover:bg-white/5 cursor-pointer flex-1">
+              <i class="fa-solid fa-gamepad text-sm sm:text-xs"></i> 
+              <span class="hidden md:inline">Games</span>
+              <span class="md:hidden text-[9px]">Games</span>
+            </button>
+            <button data-tab="tab-panel-settings" class="nav-item flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-center text-[10px] sm:text-xs font-bold tracking-wider transition-all text-slate-400 hover:text-white hover:bg-white/5 cursor-pointer flex-1">
+              <i class="fa-solid fa-sliders text-sm sm:text-xs"></i> 
+              <span class="hidden md:inline">Setelan</span>
+              <span class="md:hidden text-[9px]">Setelan</span>
+            </button>
+          </nav>
+        </div>
+      </footer>
+
+      <!-- MAIN CONTENT WRAPPER WITH PADDING TO ACCOMMODATE FIXED BOTTOMBAR -->
+      <main class="flex-grow pt-2 md:pt-4 lg:pt-5 px-4 md:px-8 lg:px-12 pb-24 md:pb-28 overflow-y-auto z-10 max-w-none w-full transition-all">
         
         <!-- ------------------------------------------------ -->
-        <!-- VIEW TABS 1: DASHBOARD PANEL -->
+        <!-- VIEW TABS 1: HOME PANEL -->
         <!-- ------------------------------------------------ -->
         <section id="panel-dashboard" class="view-panel space-y-6">
           <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div>
-              <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-white font-display text-glow">DASHBOARD CENTRAL 🌐</h1>
-              <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider font-mono">Real-time go compiler state & system telemetry</p>
+          </div>
+
+          <!-- HERO BANNER CAROUSEL CARD -->
+          <div class="relative w-full overflow-hidden large-card flex flex-col justify-between p-6 sm:p-8 min-h-[200px] shadow-[0_4px_30px_rgba(0,0,0,0.15)] border-white/5 bg-slate-950/40">
+            <!-- Background floating icon decoration -->
+            <div class="absolute right-12 bottom-2 opacity-[0.06] text-[180px] pointer-events-none select-none text-white font-mono">
+              <i class="fa-solid fa-music"></i>
             </div>
-            <div class="px-4 py-2 bg-white/5 rounded-xl border border-white/5 flex items-center gap-2 text-xs font-mono">
-              <span class="text-blue-400">SYSTEM TIME (UTC):</span>
-              <span id="dashboard-clock" class="text-emerald-400 font-bold">00:00:00</span>
+            
+            <!-- Slides wrapper -->
+            <div class="relative z-10 flex flex-col justify-between h-full flex-grow">
+              <!-- Header Slide info with Dots Indicators -->
+              <div class="flex items-start justify-between w-full">
+                <!-- Left pill -->
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500/10 border border-blue-500/25 text-[9px] font-black tracking-widest text-[#60a5fa] rounded-full uppercase">
+                  AUDIO SHIELD ACTIVE
+                </span>
+                <!-- Right dots and indicators matching the screenshot exactly -->
+                <div class="flex items-center gap-3">
+                  <!-- Navigation arrows -->
+                  <div class="flex items-center gap-2 bg-white/5 p-1 rounded-lg border border-white/5">
+                    <button id="hero-carousel-prev" class="w-6 h-6 rounded hover:bg-white/10 active:scale-95 text-[9px] text-slate-300 flex items-center justify-center cursor-pointer transition-all"><i class="fa-solid fa-chevron-left"></i></button>
+                    <!-- Indicators -->
+                    <div class="flex items-center gap-1.5 px-1.5" id="hero-carousel-indicators">
+                      <span class="w-1.5 h-1.5 rounded-full bg-blue-500 transition-all cursor-pointer" data-slide="0"></span>
+                      <span class="w-1.5 h-1.5 rounded-full bg-white/20 transition-all cursor-pointer" data-slide="1"></span>
+                      <span class="w-1.5 h-1.5 rounded-full bg-white/20 transition-all cursor-pointer" data-slide="2"></span>
+                    </div>
+                    <button id="hero-carousel-next" class="w-6 h-6 rounded hover:bg-white/10 active:scale-95 text-[9px] text-slate-300 flex items-center justify-center cursor-pointer transition-all"><i class="fa-solid fa-chevron-right"></i></button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Carousel Items Container -->
+              <div id="hero-carousel-viewport" class="mt-5 flex-grow min-h-[100px]">
+                <!-- Slide 1 Content -->
+                <div class="hero-slide relative" id="hero-slide-0">
+                  <h2 class="text-xl sm:text-2xl font-black font-display text-white tracking-tight text-glow-secondary flex items-center gap-2">
+                    🎵 Pemutar Musik Lofi Lounge
+                  </h2>
+                  <p class="text-slate-300 text-xs sm:text-sm mt-2 leading-relaxed max-w-2xl font-body">
+                    Unggah berkas MP3 favorit Anda secara lokal atau mainkan track lofi pilihan dengan kendali volume presisi, visualisasi gelombang digital, dan timeline responsif.
+                  </p>
+                  <p class="text-[9px] md:text-[10px] font-mono tracking-wider text-slate-400 uppercase mt-4">
+                    [WASM Direct Stream Card • Buffer Optimization Enabled]
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- SYSTEM TELEMETRY CARDS (Bento Style) -->
+          <!-- BENTO QUICK STATS CARDS -->
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
             
-            <div class="glow-border bg-slate-900/40 p-4 rounded-xl flex items-center gap-4">
-              <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 text-xl"><i class="fa-solid fa-gears animate-spin"></i></div>
-              <div class="min-w-0">
-                <p class="text-[10px] font-mono tracking-wider opacity-50 uppercase">Go WASM Status</p>
-                <p class="text-sm font-bold font-mono text-emerald-400 truncate text-glow-secondary">READY-STABLE</p>
+            <!-- Card 1: Cuaca -->
+            <div class="small-card p-4 rounded-2xl border border-white/10 bg-slate-950/40 hover:border-amber-500/25 transition-all flex items-center justify-between">
+              <div class="space-y-1">
+                <p class="text-[10px] font-mono tracking-widest text-slate-400 uppercase">CUACA (BEKASI)</p>
+                <p class="text-2xl sm:text-3xl font-black text-white font-display">26°C</p>
+                <p class="text-[10px] text-slate-500 font-medium">Cerah / Berawan</p>
+              </div>
+              <div class="text-2xl text-amber-500 flex items-center justify-center pr-1">
+                <i class="fa-solid fa-sun animate-spin-slow"></i>
               </div>
             </div>
 
-            <div class="glow-border bg-slate-900/40 p-4 rounded-xl flex items-center gap-4">
-              <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 text-xl"><i class="fa-solid fa-users"></i></div>
-              <div class="min-w-0">
-                <p class="text-[10px] font-mono tracking-wider opacity-50 uppercase">User RAM</p>
-                <p id="stat-registered-users" class="text-lg font-bold font-mono text-white truncate">1 Pengguna</p>
+            <!-- Card 2: Jadwal Sholat -->
+            <div class="small-card p-4 rounded-2xl border border-white/10 bg-slate-950/40 hover:border-blue-500/25 transition-all flex items-center justify-between">
+              <div class="space-y-1">
+                <p class="text-[10px] font-mono tracking-widest text-slate-400 uppercase">JADWAL SHOLAT</p>
+                <p class="text-[10px] font-bold text-blue-400">Next: <span id="dash-next-prayer-name" class="uppercase">MAGHRIB</span></p>
+                <p class="text-2xl sm:text-3xl font-black text-white font-display">17:44</p>
+                <p class="text-[9px] text-slate-500 truncate" id="dash-prayer-hint">Dzuhur 11:47 • Ashar 15:08</p>
               </div>
             </div>
 
-            <div class="glow-border bg-slate-900/40 p-4 rounded-xl flex items-center gap-4">
-              <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 text-xl"><i class="fa-solid fa-shield"></i></div>
-              <div class="min-w-0">
-                <p class="text-[10px] font-mono tracking-wider opacity-50 uppercase">Firewall Level</p>
-                <p class="text-sm font-bold font-mono text-white truncate text-amber-400 uppercase text-glow">HIGH SHIELD</p>
+            <!-- Card 3: To-Do Status -->
+            <div class="small-card p-4 rounded-2xl border border-white/10 bg-slate-950/40 hover:border-indigo-500/25 transition-all flex items-center justify-between cursor-pointer focus:outline-none" onclick="document.querySelector('[data-tab=tab-panel-tugas]')?.click()">
+              <div class="space-y-1">
+                <p class="text-[10px] font-mono tracking-widest text-slate-400 uppercase">TO-DO STATUS</p>
+                <p class="text-2xl sm:text-3xl font-black text-white font-display" id="dash-todo-ratio">0<span class="text-slate-500 font-medium">/0</span></p>
+                <p class="text-[10px] text-slate-500 font-medium">Tugas selesai</p>
               </div>
             </div>
 
-            <div class="glow-border bg-slate-900/40 p-4 rounded-xl flex items-center gap-4">
-              <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-xl"><i class="fa-solid fa-microchip animate-pulse"></i></div>
-              <div class="min-w-0">
-                <p class="text-[10px] font-mono tracking-wider opacity-50 uppercase">RAM Thread Usage</p>
-                <p class="text-sm font-bold font-mono text-white truncate"><span id="val-usage-percentage" class="text-emerald-400 font-bold">14.2%</span></p>
+            <!-- Card 4: Jurnal Entri -->
+            <div class="small-card p-4 rounded-2xl border border-white/10 bg-slate-950/40 hover:border-rose-500/25 transition-all flex items-center justify-between cursor-pointer focus:outline-none" onclick="document.querySelector('[data-tab=tab-panel-diary]')?.click()">
+              <div class="space-y-1">
+                <p class="text-[10px] font-mono tracking-widest text-slate-400 uppercase">JURNAL ENTRI</p>
+                <p class="text-2xl sm:text-3xl font-black text-white font-display" id="dash-journal-count">0</p>
+                <p class="text-[10px] text-slate-500 font-medium">Total catatan pribadi</p>
               </div>
             </div>
 
           </div>
 
-          <!-- BENTO DOUBLE SECTION: CPU STATS & GENERAL INFORMATION -->
+          <!-- TWO COLUMN SECTION: STATS CHART & JADWAL LENGKAP -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <div class="lg:col-span-2 glow-border bg-slate-900/50 p-6 rounded-2xl flex flex-col justify-between space-y-6">
+            <!-- Left: Weekly Stats Chart (2 cols) -->
+            <div class="lg:col-span-2 large-card flex flex-col justify-between space-y-4 shadow-[0_4px_25px_rgba(0,0,0,0.1)]">
               <div class="flex items-center justify-between border-b border-white/5 pb-2">
-                <h3 class="text-sm font-display font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5"><i class="fa-solid fa-chart-bar text-blue-400"></i> Thread Performance Analytics</h3>
-                <span class="text-[10px] text-slate-400 font-mono text-glow">INTERVAL: 5s Live</span>
+                <h3 class="text-xs font-mono uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-chart-line text-rose-500"></i> STATISTIK TUGAS MINGGUAN
+                </h3>
+                <span class="text-[9px] text-[#fb7185] font-mono font-bold uppercase" id="weekly-chart-status">Active Tasks Tracker</span>
               </div>
               
-              <!-- SVG CUSTOM DYNAMIC BAR CHART (Alternative to recharts for pure performance & vanilla stability) -->
-              <div class="relative w-full h-52 flex items-end justify-between px-2 pt-4 border-b border-l border-white/10" id="vanilla-chart-container">
-                <!-- Javascript will load dynamic SVG/bars here for thread log monitoring -->
+              <!-- Weekly chart SVG - Fully Custom styled dynamic SVG rendered by JS -->
+              <div class="relative w-full h-56 flex items-end justify-between px-2 pt-4" id="weekly-tasks-chart-container">
+                <!-- Generates a beautiful CSS/SVG line or bar chart representing days -->
+                <div class="w-full h-full flex flex-col items-center justify-center gap-2 p-4 text-xs font-mono text-slate-500 text-center">
+                  <i class="fa-solid fa-chart-simple text-rose-500 text-lg animate-pulse"></i>
+                  Loading Weekly Stats Engine...
+                </div>
               </div>
-
-              <!-- Legend -->
-              <div class="flex items-center justify-center gap-6 text-[10px] font-mono text-slate-400">
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-blue-500"></span> Register Hashing Queue</span>
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span> Calendar Grid Loops</span>
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-indigo-500"></span> Audio Buffer Stream</span>
+              
+              <div class="flex items-center justify-between text-[10px] font-mono text-slate-500 border-t border-white/5 pt-2">
+                <span>Completed Tasks Trend</span>
+                <span class="text-rose-400 font-bold uppercase transition-all duration-300" id="weekly-chart-legend">Completed: Mon - Sun</span>
               </div>
             </div>
 
-            <!-- Left Grid: Quick action terminal panel -->
-            <div class="glow-border bg-slate-900/50 p-6 rounded-2xl flex flex-col justify-between space-y-4 relative">
+            <!-- Right: Schedules (1 col) -->
+            <div class="large-card flex flex-col justify-between space-y-4 shadow-[0_4px_25px_rgba(0,0,0,0.1)]">
               <div class="flex items-center justify-between border-b border-white/5 pb-2">
-                <h3 class="text-sm font-display font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5"><i class="fa-solid fa-terminal text-emerald-400"></i> Interactive Command</h3>
-                <span class="relative flex h-2 w-2">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
+                <h3 class="text-xs font-mono uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-clock text-blue-400"></i> JADWAL LENGKAP
+                </h3>
               </div>
+              
+              <!-- Prayer Schedules List matching exact layout on the image -->
+              <div class="space-y-1 flex-grow flex flex-col justify-center">
+                
+                <div class="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/5 cursor-pointer">
+                  <span class="text-[10px] font-mono tracking-wider text-slate-400 font-medium uppercase">SUBUH</span>
+                  <span class="text-xs font-bold font-mono text-white">04:31</span>
+                </div>
+                
+                <div class="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/5 cursor-pointer">
+                  <span class="text-[10px] font-mono tracking-wider text-slate-400 font-medium uppercase">DZUHUR</span>
+                  <span class="text-xs font-bold font-mono text-white">11:47</span>
+                </div>
+                
+                <div class="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/5 cursor-pointer">
+                  <span class="text-[10px] font-mono tracking-wider text-slate-400 font-medium uppercase">ASHAR</span>
+                  <span class="text-xs font-bold font-mono text-white">15:08</span>
+                </div>
+                
+                <div class="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/5 cursor-pointer">
+                  <span class="text-[10px] font-mono tracking-wider text-slate-400 font-medium uppercase">MAGHRIB</span>
+                  <span class="text-xs font-bold font-mono text-white">17:44</span>
+                </div>
+                
+                <div class="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/5 cursor-pointer">
+                  <span class="text-[10px] font-mono tracking-wider text-slate-400 font-medium uppercase">ISYA</span>
+                  <span class="text-xs font-bold font-mono text-white">18:53</span>
+                </div>
 
-              <div class="bg-black/8 w-full flex-grow p-3 rounded-lg border border-white/5 font-mono text-[11px] h-36 overflow-y-auto text-emerald-300 space-y-1.5" id="console-terminal-lines">
-                <p class="text-slate-500">[2026-05-24] Console started. Type 'help'</p>
               </div>
-
-              <div class="flex gap-2">
-                <input type="text" id="terminal-input" placeholder="Masukkan instruksi..." class="flex-grow bg-slate-950 border border-white/15 rounded-lg px-3 py-1.5 text-xs font-mono text-white outline-none focus:border-emerald-500/50 outline-none" />
-                <button id="btn-terminal-send" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 font-bold rounded-lg text-xs font-mono uppercase text-white cursor-pointer"><i class="fa-solid fa-paper-plane"></i></button>
+              
+              <div class="text-[10px] font-mono text-slate-500 border-t border-white/5 pt-2 text-center truncate">
+                Tersinkronisasi otomatis dengan Node Sholat GMT+7
               </div>
             </div>
 
           </div>
+        </section>
 
-          <!-- LATEST STATED ACTIVITY LOGGER FROM GO -->
-          <div class="glow-border bg-slate-900/40 p-6 rounded-2xl space-y-4">
-            <h3 class="text-xs font-mono uppercase tracking-widest text-slate-400 flex items-center gap-1.5"><i class="fa-solid fa-list text-blue-400"></i> Riwayat Keamanan Kernel Terakhir</h3>
-            <div class="overflow-x-auto w-full">
-              <table class="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr class="border-b border-white/10 text-slate-500 font-mono text-[10px]">
-                    <th class="py-2.5 px-4 font-normal">TIMESTAMP</th>
-                    <th class="py-2.5 px-4 font-normal">PERISTIWA SYSTEM</th>
-                    <th class="py-2.5 px-4 font-normal">STATUS SINKRONISASI</th>
-                  </tr>
-                </thead>
-                <tbody id="table-logs-tbody" class="font-mono text-slate-300">
-                  <!-- Loaded dynamically by main.ts -->
-                </tbody>
-              </table>
+        <!-- ------------------------------------------------ -->
+        <!-- VIEW TABS 1.5: TUGAS (TODO LIST) PANEL -->
+        <!-- ------------------------------------------------ -->
+        <section id="panel-tugas" class="view-panel hidden space-y-6">
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <h1 class="text-3xl font-extrabold uppercase tracking-tight text-white font-display text-glow">Tugas & Agenda 📋</h1>
+              <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider font-mono">Daftar tugas personal dengan filter prioritas</p>
             </div>
+            
+            <div class="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/10 text-xs font-mono">
+              <span class="text-indigo-400 pl-2">STATUS TASK:</span>
+              <span id="tugas-counter-badge" class="text-teal-400 font-black pr-2">0 Selesai</span>
+            </div>
+          </div>
+
+          <!-- Adding task form & interactive lists inside bento cards -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Col1: Input form (1 column) -->
+            <div class="smallmid-card flex flex-col justify-between space-y-4">
+              <div class="space-y-3">
+                <p class="text-xs font-mono uppercase tracking-widest text-[#a5b4fc] border-b border-white/5 pb-2">Buat Tugas Baru</p>
+                
+                <div class="space-y-3">
+                  <div>
+                    <label class="block text-[10px] font-mono uppercase tracking-widest text-slate-400 mb-1.5">Nama Tugas</label>
+                    <input type="text" id="tugas-input-title" placeholder="Belajar Go WASM, Coding, dll..." class="w-full bg-slate-950 border border-white/15 px-3 py-2.5 rounded-xl text-xs text-white outline-none focus:border-blue-400/50" />
+                  </div>
+                  
+                  <div>
+                    <label class="block text-[10px] font-mono uppercase tracking-widest text-slate-400 mb-1.5">Tenggat Waktu</label>
+                    <input type="date" id="tugas-input-date" class="w-full bg-slate-950 border border-white/15 px-3 py-2.5 rounded-xl text-xs text-white outline-none focus:border-blue-400/50" />
+                  </div>
+                  
+                  <div>
+                    <label class="block text-[10px] font-mono uppercase tracking-widest text-slate-400 mb-1.5 font-medium">Tingkat Prioritas</label>
+                    <div class="flex items-center gap-2">
+                      <button type="button" class="tugas-priority-btn flex-1 py-1.5 px-2 rounded-lg text-[9px] font-black uppercase text-center bg-teal-500/15 text-teal-400 border border-teal-500/30 selected" data-priority="Low">Low</button>
+                      <button type="button" class="tugas-priority-btn flex-1 py-1.5 px-2 rounded-lg text-[9px] font-black uppercase text-center bg-amber-500/15 text-amber-500 border border-white/5" data-priority="Medium">Medium</button>
+                      <button type="button" class="tugas-priority-btn flex-1 py-1.5 px-2 rounded-lg text-[9px] font-black uppercase text-center bg-red-400/15 text-red-500 border border-white/5" data-priority="High">High</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <button id="tugas-btn-add" class="w-full py-2.5 btn-glow text-xs font-black uppercase text-white rounded-xl cursor-pointer">
+                Tambahkan Tugas ✨
+              </button>
+            </div>
+
+            <!-- Col2: Tasks list (2 columns) -->
+            <div class="lg:col-span-2 large-card space-y-4">
+              <div class="flex items-center justify-between border-b border-white/5 pb-2">
+                <p class="text-xs font-mono uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-clipboard-list text-blue-400"></i> Daftar Aktivitas Anda
+                </p>
+                <div class="flex items-center gap-1 p-1 bg-white/5 border border-white/10 rounded-lg">
+                  <button class="tugas-filter-btn px-2 py-1 text-[9px] font-black uppercase text-blue-400 bg-blue-500/10 rounded-md cursor-pointer" data-filter="all">Semua</button>
+                  <button class="tugas-filter-btn px-2 py-1 text-[9px] text-slate-400 font-extrabold uppercase cursor-pointer" data-filter="pending">Belum</button>
+                  <button class="tugas-filter-btn px-2 py-1 text-[9px] text-slate-400 font-extrabold uppercase cursor-pointer" data-filter="completed">Selesai</button>
+                </div>
+              </div>
+              
+              <div id="tugas-list-items" class="space-y-3 max-h-[360px] overflow-y-auto pr-1">
+                <!-- Loaded dynamically by main.ts -->
+                <div class="text-center py-12 text-slate-500 text-xs font-mono">
+                  Belum ada tugas terdaftar. Tambahkan tugas baru Anda di kolom kiri!
+                </div>
+              </div>
+            </div>
+
           </div>
         </section>
 
@@ -541,7 +1036,7 @@
               </div>
 
               <!-- Main Calendar Grid Sheet -->
-              <div class="glow-border bg-slate-900/40 p-6 rounded-2xl space-y-4">
+              <div class="large-card space-y-4">
                 <div class="grid grid-cols-7 gap-1 text-center font-mono text-[10px] font-extrabold tracking-widest text-[#a5b4fc] border-b border-white/15 pb-2 uppercase">
                   <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
                 </div>
@@ -569,7 +1064,7 @@
               </div>
 
               <!-- Adding agenda form -->
-              <div class="glow-border bg-slate-900/50 p-4 rounded-xl space-y-3" id="calendar-agenda-form">
+              <div class="smallmid-card space-y-3" id="calendar-agenda-form">
                 <p class="text-[10px] font-mono uppercase tracking-widest text-slate-400">Tambah Detail Kegiatan</p>
                 <div class="space-y-2">
                   <input type="text" id="input-agenda-title" placeholder="Nama agenda / janji temu..." class="w-full bg-slate-950 border border-white/15 px-3 py-2 rounded-lg text-xs outline-none focus:border-blue-400/50 text-white outline-none" />
@@ -651,7 +1146,7 @@
               </div>
 
               <!-- Main Paper Sheet Textarea Mockup -->
-              <div class="w-full rounded-2xl shadow-inner glow-border relative overflow-hidden bg-white/5">
+              <div class="w-full xl-card shadow-inner relative overflow-hidden !p-0">
                 <div class="p-4 border-b border-black/5 bg-slate-950/60 flex items-center justify-between text-xs">
                   <span class="text-slate-400 font-mono text-[10px]">DIARY HANDBOOK — JOURNAL DOCK</span>
                   <span class="text-slate-400" id="label-diary-autosaved">Secured Local Cache</span>
@@ -679,7 +1174,7 @@
 
               <div class="space-y-3 max-h-[500px] overflow-y-auto pr-1" id="diary-history-sheets-container">
                 <!-- Javascript will inject list cards representing diary cards -->
-                <div class="italic text-slate-500 text-xs text-center py-20 bg-slate-900/10 rounded-xl glow-border">Belum ada lembaran diary. Buat di sebelah kiri!</div>
+                <div class="smallmid-card italic text-slate-500 text-xs text-center py-20 bg-slate-900/10">Belum ada lembaran diary. Buat di sebelah kiri!</div>
               </div>
             </div>
 
@@ -705,7 +1200,7 @@
           </div>
 
           <!-- GAME WINDOW PANEL CONTAINER -->
-          <div class="glow-border bg-slate-900/40 p-8 rounded-2xl flex flex-col items-center justify-center max-w-2xl mx-auto text-center" id="game-active-viewport">
+          <div class="large-card flex flex-col items-center justify-center max-w-2xl mx-auto text-center" id="game-active-viewport">
             
             <!-- GAME 1: TIC TAC TOE (DEFAULT) -->
             <div id="game-segment-tictactoe" class="space-y-6 w-full max-w-sm">
@@ -734,7 +1229,7 @@
               <h2 class="text-lg font-bold font-mono tracking-widest text-slate-300">RNG DICE ROLL CALCULATOR</h2>
               <p class="text-xs text-slate-400">Tekan tombol untuk melempar dadu random loop</p>
 
-              <div id="dice-graphic" class="w-24 h-24 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white text-4xl font-black mx-auto shadow-2xl transition-all glow-border">
+              <div id="dice-graphic" class="w-24 h-24 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white text-4xl font-black mx-auto shadow-2xl transition-all smallmid-card">
                 6
               </div>
 
@@ -775,87 +1270,233 @@
         <!-- VIEW TABS 5: MUSIC ROOM -->
         <!-- ------------------------------------------------ -->
         <section id="panel-player" class="view-panel hidden space-y-6">
-          <div class="flex items-center justify-between border-b border-white/5 pb-2">
-            <div>
-              <h1 class="text-3xl font-extrabold uppercase tracking-tight text-white font-display text-glow">Lo-Fi Pulse Player 🎵</h1>
-              <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider font-mono">Continuous desktop audio node engine with file loading option</p>
-            </div>
-            
-            <div class="flex items-center gap-1 p-1 bg-white/5 border border-white/5 rounded-xl">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-2"></span>
-              <span class="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider px-2 pr-3">Stereo Buffer Active</span>
+
+          <div class="w-full">
+            <!-- Integrated Player Core: Track Header + Lyrics Main Area + Controllers Footer -->
+            <!-- h-[650px] is fixed to keep the entire experience sleek and non-scrollable as requested -->
+            <div class="large-card glow-card-primary flex flex-col h-[650px] p-4 sm:p-5 relative overflow-hidden">
+                
+              <!-- 1. HEADER: Track image, judul lagu, and artist -->
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/5 pb-3.5 shrink-0 text-center sm:text-left">
+                <div class="flex flex-col sm:flex-row items-center gap-4 min-w-0 flex-1">
+                  <!-- Track cover image -->
+                  <div id="music-disc-artwork" class="w-16 h-16 rounded-full bg-gradient-to-br from-rose-500 via-purple-600 to-indigo-600 flex items-center justify-center relative shadow-lg overflow-hidden transition-all duration-300 shrink-0 border border-white/10">
+                    <div class="absolute inset-1.5 rounded-full border border-white/10"></div>
+                    <!-- Vinyl center representation -->
+                    <div class="w-3.5 h-3.5 rounded-full bg-slate-950 flex items-center justify-center border-2 border-slate-900 z-10"></div>
+                  </div>
+
+                  <!-- Text metadata details & playback state -->
+                  <div class="min-w-0 flex-1">
+                    <h2 id="music-track-title" class="text-2xl sm:text-3xl font-extrabold text-white truncate max-w-full uppercase font-display tracking-tight text-glow-secondary">Tidak Ada Lagu Terpilih</h2>
+                    <p id="music-track-artist" class="text-xs text-slate-400 font-mono mt-0.5">Silakan pilih lagu dari daftar putar</p>
+                  </div>
+                </div>
+
+                <!-- Live badges on the far right corner -->
+                <div class="flex items-center gap-2 shrink-0 sm:self-center">
+                  <span id="music-source-badge" class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">Audio Synth</span>
+                  <span id="music-lyrics-status-badge" class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border border-purple-500/30 bg-purple-500/10 text-purple-400">Lirik Ada</span>
+                </div>
+              </div>
+
+              <!-- 2. MAIN BENTO GRID: Lyrics (Left, large) & Next Playing (Right, compact) -->
+              <div class="flex-grow grid grid-cols-1 md:grid-cols-12 gap-4 overflow-hidden py-2">
+                <!-- Left: Lyrics display -->
+                <div class="md:col-span-9 flex flex-col relative overflow-hidden h-full">
+                  <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 shrink-0 mb-1 select-none uppercase tracking-wider">
+                    <span class="flex items-center gap-1.5">Lirik</span>
+                  </div>
+                  
+                  <!-- Display interactive lyrics view scrollable -->
+                  <div id="lyrics-display-scroller" class="flex-grow overflow-y-auto space-y-4 pr-1 text-center py-2 scroll-smooth" style="mask-image: linear-gradient(to bottom, transparent 0%, white 15%, white 85%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, white 15%, white 85%, transparent 100%);">
+                    <!-- Lyrics will be generated here -->
+                    <div class="text-slate-500 text-sm sm:text-base py-16">
+                      Lirik lagu akan tampil otomatis saat musik dimainkan.
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right: Inline Next Playing Queue inside card -->
+                <div class="md:col-span-3 flex flex-col h-full bg-slate-950/40 rounded-xl p-3 overflow-hidden glow-card-emerald border">
+                  <div class="flex items-center justify-between border-b border-white/5 pb-2 shrink-0">
+                    <h4 class="text-[10px] font-display font-medium uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                      <i class="fa-solid fa-play-pause text-emerald-400"></i> Antrean Lagu
+                    </h4>
+                    <span id="music-inline-queue-counter" class="text-[9px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded">0 Lagu</span>
+                  </div>
+
+                  <!-- Scrollable mini list queue entries -->
+                  <div class="flex-grow space-y-1.5 overflow-y-auto pr-1 mt-2" id="music-inline-playlist-queue">
+                    <div class="text-center italic text-slate-500 text-[10px] py-10">
+                      <p>Memuat antrean...</p>
+                    </div>
+                  </div>
+
+                  <!-- Quick Add button at bottom of next playing list -->
+                  <button id="btn-inline-open-add" class="mt-2 w-full py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 border border-emerald-500/20 uppercase font-bold text-[9px] tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-plus-circle text-[9px]"></i> Tambah Lagu baru
+                  </button>
+                </div>
+              </div>
+
+              <!-- 3. FOOTER: Playback Controller & Tracker -->
+              <div class="border-t border-white/5 pt-3 shrink-0 space-y-2.5">
+                <div class="flex items-center justify-between text-[11px] font-mono text-slate-400 select-none">
+                  <span id="music-time-current" class="bg-slate-950 px-2 py-0.5 rounded border border-white/5 font-bold">00:00</span>
+                  <!-- Playback spectrum graphics -->
+                  <div class="w-1/2 h-1 bg-white/5 rounded-full overflow-hidden relative hidden sm:block">
+                    <div class="absolute inset-0 bg-emerald-500/20 w-full animate-pulse"></div>
+                  </div>
+                  <span id="music-time-duration" class="bg-slate-950 px-2 py-0.5 rounded border border-white/5 font-bold font-mono">00:00</span>
+                </div>
+
+                <!-- Drag/Scrub Slider -->
+                <input type="range" id="music-tracker-slider" min="0" max="100" value="0" class="w-full h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer outline-none accent-emerald-400" />
+                
+                <!-- Physical Buttons & Volume Dock -->
+                <div class="flex items-center justify-between gap-4 pt-0.5">
+                  <!-- Control Buttons Left -->
+                  <div class="flex items-center gap-2">
+                    <button id="btn-music-prev" class="w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-all text-xs cursor-pointer border border-white/5" title="Lagu Sebelumnya"><i class="fa-solid fa-backward-step"></i></button>
+                    <button id="btn-music-play" class="w-11 h-11 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 hover:text-white flex items-center justify-center text-xs cursor-pointer shadow-lg border border-emerald-500/30 transition-all">
+                      <i class="fa-solid fa-play translate-x-0.5"></i>
+                    </button>
+                    <button id="btn-music-next" class="w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-all text-xs cursor-pointer border border-white/5" title="Trek Selanjutnya"><i class="fa-solid fa-forward-step"></i></button>
+                    <button id="btn-toggle-queue" class="w-9 h-9 flex items-center justify-center bg-emerald-500/5 hover:bg-emerald-500/10 rounded-xl text-emerald-500 hover:text-emerald-400 border border-emerald-500/10 transition-all text-xs cursor-pointer" title="Buka Playlist Popup">
+                      <i class="fa-solid fa-list-ul"></i>
+                    </button>
+                  </div>
+
+                  <!-- Control Buttons Right: Shuffle, Repeat + Volume -->
+                  <div class="flex items-center gap-3.5">
+                    <!-- Shuffle & Repeat -->
+                    <div class="flex items-center gap-1.5 shrink-0">
+                      <button id="btn-music-shuffle" class="w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-all text-xs cursor-pointer border border-white/5" title="Acak Lagu (Shuffle)">
+                        <i class="fa-solid fa-shuffle"></i>
+                      </button>
+                      <button id="btn-music-repeat" class="w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-all text-xs cursor-pointer border border-white/5" title="Ulangi Lagu (Repeat)">
+                        <i class="fa-solid fa-repeat"></i>
+                      </button>
+                    </div>
+
+                    <!-- Volume slider control -->
+                    <div class="flex items-center gap-2 bg-slate-950/60 pl-3 pr-3.5 py-1.5 rounded-xl border border-white/5 shrink-0 select-none">
+                      <i class="fa-solid fa-volume-low text-[10px] text-emerald-400"></i>
+                      <input type="range" id="music-volume-slider" min="0" max="100" value="70" class="w-16 sm:w-24 h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer outline-none accent-emerald-400" />
+                      <i class="fa-solid fa-volume-high text-[10px] text-emerald-400"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Left Side controls: Vinyl/Disc visual & progress -->
-            <div class="glow-border bg-slate-900/40 p-8 rounded-2xl flex flex-col items-center justify-center text-center">
-              <span class="text-[10px] font-mono uppercase tracking-widest text-blue-400 mb-6 font-black uppercase text-glow">Sedang Diputar</span>
-              
-              <!-- Vinyl disc rotate visual representation -->
-              <div id="music-disc-artwork" class="w-40 h-40 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mb-8 relative shadow-2xl overflow-hidden transition-all duration-300">
-                <div class="absolute inset-4 rounded-full border border-white/10"></div>
-                <div class="absolute inset-10 rounded-full border border-white/20"></div>
-                <!-- Mini vinyl hole -->
-                <div class="w-8 h-8 rounded-full bg-slate-950 flex items-center justify-center border-4 border-slate-900 relative z-25"></div>
+          <!-- BACKDROP MODAL: PLAYLIST QUEUE LIST -->
+          <div id="modal-playlist-queue" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 transition-all duration-300 opacity-0 pointer-events-none">
+            <div class="large-card max-w-md w-full p-5 flex flex-col space-y-4 max-h-[85vh] relative border border-white/10 shadow-[0_10px_50px_rgba(0,0,0,0.5)]">
+              <!-- Close Button -->
+              <button id="btn-close-queue" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors cursor-pointer text-sm w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/5 hover:bg-white/10" title="Tutup">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+
+              <div class="border-b border-white/5 pb-2.5 flex items-center justify-between shrink-0 pr-8">
+                <h3 class="text-sm font-display font-bold uppercase text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-list-ul text-emerald-400"></i> Daftar Putar</h3>
+                <span id="music-queue-counter" class="text-[9px] font-mono text-slate-500 uppercase font-black bg-white/5 px-2 py-0.5 rounded">0 Lagu</span>
               </div>
 
-              <h2 id="music-track-title" class="text-lg font-bold text-white mb-1 truncate max-w-xs uppercase font-display">Tidak Ada Trek Terpilih</h2>
-              <p class="text-[10px] text-slate-400 uppercase tracking-widest font-mono">Lo-Fi Pulse • Stereo Feed</p>
-
-              <!-- Tracker layout slider -->
-              <div class="w-full space-y-4 mt-6">
-                <div class="flex items-center justify-between text-[11px] font-mono text-slate-400 select-none">
-                  <span id="music-time-current">00:00</span>
-                  <span id="music-time-duration">00:00</span>
-                </div>
-                <!-- Progress bar interactive inputs -->
-                <input type="range" id="music-tracker-slider" min="0" max="100" value="0" class="w-full h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer outline-none accent-blue-400" />
-                
-                <!-- Main controllers dock -->
-                <div class="flex items-center justify-center gap-6 pt-4">
-                  <button id="btn-music-prev" class="p-3 text-slate-400 hover:text-white transition-all text-sm cursor-pointer" title="Lagu Sebelumnya"><i class="fa-solid fa-backward-step"></i></button>
-                  <button id="btn-music-play" class="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-xl cursor-pointer shadow-lg outline-none transition-all " title="Mulai / Pause Lagu">
-                    <i class="fa-solid fa-play translate-x-0.5"></i>
-                  </button>
-                  <button id="btn-music-next" class="p-3 text-slate-400 hover:text-white transition-all text-sm cursor-pointer" title="Lagu Selanjutnya"><i class="fa-solid fa-forward-step"></i></button>
-                </div>
-
-                <!-- Volume slider segments -->
-                <div class="flex items-center justify-center gap-3 pt-6 max-w-xs mx-auto text-xs text-slate-400">
-                  <i class="fa-solid fa-volume-low"></i>
-                  <input type="range" id="music-volume-slider" min="0" max="100" value="70" class="w-full h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer outline-none accent-blue-400" />
-                  <i class="fa-solid fa-volume-high"></i>
+              <!-- Scrollable list queue entries -->
+              <div class="flex-grow space-y-1.5 overflow-y-auto pr-1" id="music-playlist-queue">
+                <div class="text-center italic text-slate-500 text-xs py-10">
+                  <p>Memuat daftar putar...</p>
                 </div>
               </div>
+
+              <!-- Open input track -->
+              <button id="btn-open-add-track" class="w-full py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 border border-emerald-500/20 uppercase font-bold text-[10px] tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-[0_0_15px_-4px_rgba(16,185,129,0.15)]">
+                <i class="fa-solid fa-circle-plus"></i> TAMBAH LAGU & LIRIK BARU
+              </button>
             </div>
+          </div>
 
-            <!-- Right side control: Playlist file uploads and list queue -->
-            <div class="glow-border bg-slate-900/40 p-6 rounded-2xl flex flex-col justify-between space-y-6">
-              
-              <div class="flex items-center justify-between border-b border-white/10 pb-2">
-                <h3 class="text-sm font-display font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5"><i class="fa-solid fa-list-ul text-blue-400"></i> Playlist & Media Queue</h3>
-                <!-- Custom file button -->
-                <label class="px-3.5 py-1.5 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/25 text-blue-200 hover:text-white text-[10px] font-mono font-bold rounded-lg cursor-pointer transition-all flex items-center gap-1.5 uppercase">
-                  <i class="fa-solid fa-file-audio"></i> Muat File MP3
-                  <input type="file" id="music-file-uploader" accept="audio/mp3,audio/*" multiple class="hidden" />
-                </label>
+          <!-- BACKDROP MODAL: ADD TRACK & LYRICS FORM -->
+          <div id="modal-add-track" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 transition-all duration-300 opacity-0 pointer-events-none">
+            <div class="large-card max-w-lg w-full p-5 flex flex-col space-y-4 max-h-[90vh] overflow-y-auto relative border border-white/10 shadow-[0_10px_50px_rgba(0,0,0,0.5)]">
+              <!-- Close Button -->
+              <button id="btn-close-add-track" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors cursor-pointer text-sm w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/5 hover:bg-white/10" title="Tutup Modal">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+
+              <div class="border-b border-white/5 pb-2.5 flex items-center justify-between shrink-0 pr-8">
+                <h3 class="text-sm font-display font-black uppercase text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-circle-plus text-rose-500"></i> Buat & Tambah Lagu Baru</h3>
+                <span class="text-[8px] font-mono text-slate-400">[Metadata Audio]</span>
               </div>
 
-              <!-- Playlist Queue list wrapper -->
-              <div class="flex-grow space-y-2 overflow-y-auto max-h-[380px] pr-1" id="music-playlist-queue">
-                <!-- Javascript will load loaded track files here recursively -->
-                <div class="text-center italic text-slate-500 text-xs py-16">
-                  <p>Belum ada media terdaftar.</p>
-                  <p class="mt-1 text-[10px]">Silakan muat file audio lokal milik Anda (MP3) menggunakan tombol di atas!</p>
+              <!-- Cara menambahkan lagu & Lirik Tutorial Box -->
+              <div class="bg-emerald-500/5 text-emerald-400/90 text-[11px] leading-relaxed p-3.5 rounded-xl border border-emerald-500/20 font-sans space-y-1.5 shrink-0">
+                <span class="font-bold text-white flex items-center gap-1.5 uppercase text-xs tracking-wider">
+                  <i class="fa-solid fa-circle-info"></i> Petunjuk Singkat Sinkronisasi Lirik
+                </span>
+                <ul class="list-disc list-inside space-y-1 text-slate-300">
+                  <li>Masukkan <span class="text-white font-semibold">Judul</span> &amp; <span class="text-white font-semibold">Nama Artis</span> di bawah ini.</li>
+                  <li>Sematkan file <span class="text-emerald-400 font-semibold font-mono">.MP3</span> sendiri, atau biarkan <span class="text-white font-semibold">kosong</span> untuk memainkan musik instrumen otomatis secara gratis!</li>
+                  <li>Tulis lirik menggunakan penanda waktu format <span class="font-mono text-emerald-400 bg-black/40 px-1 py-0.5 rounded">[menit:detik.milidetik]</span> untuk sinkronisasi karaoke otomatis.</li>
+                </ul>
+                <div class="text-[10px] text-slate-400 italic pt-1 border-t border-emerald-500/10">
+                  Contoh: <code class="font-mono text-slate-200">[00:05.00] Melodi indah terdengar di malam hari</code>
                 </div>
               </div>
-              
-              <!-- Info Box -->
-              <div class="p-3 bg-slate-950/40 rounded-xl border border-white/5 text-[10px] font-mono text-slate-400 text-center leading-relaxed">
-                Trek tersimpan secara andal dalam pointer memori lokal. <br />Handplay berkelanjutan mendukung transisi tab tanpa jeda!
-              </div>
 
+              <div class="space-y-3.5">
+                <!-- Title & Artist grid inputs -->
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="space-y-1">
+                    <label class="text-[9px] font-mono tracking-wider font-extrabold text-slate-400 uppercase">Judul Lagu *</label>
+                    <input type="text" id="add-track-title" placeholder="cth. Sunset Drive" class="w-full bg-slate-950 border border-white/10 px-3 py-2 rounded-lg text-xs text-white outline-none focus:border-blue-400/50" />
+                  </div>
+                  <div class="space-y-1">
+                    <label class="text-[9px] font-mono tracking-wider font-extrabold text-slate-400 uppercase">Artis / Desainer</label>
+                    <input type="text" id="add-track-artist" placeholder="cth. Synth Gopher" class="w-full bg-slate-950 border border-white/10 px-3 py-2 rounded-lg text-xs text-white outline-none focus:border-blue-400/50" />
+                  </div>
+                </div>
+
+                <!-- Audio Source upload -->
+                <div class="space-y-1">
+                  <label class="text-[9px] font-mono tracking-wider font-extrabold text-slate-400 uppercase block">File Audio (MP3 / WAV)</label>
+                  <div class="flex items-center gap-2">
+                    <label class="px-3.5 py-2 bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 text-[10px] font-mono font-bold rounded-lg cursor-pointer transition-all flex items-center gap-2 flex-1 justify-center uppercase">
+                      <i class="fa-solid fa-file-audio text-blue-400"></i> <span id="add-track-file-label">PILIH FILE MP3...</span>
+                      <input type="file" id="add-track-file" accept="audio/mp3,audio/wav,audio/*" class="hidden" />
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Lyrics input system -->
+                <div class="space-y-1">
+                  <div class="flex justify-between items-center">
+                    <label class="text-[9px] font-mono tracking-wider font-extrabold text-slate-400 uppercase">Input Lirik Lagu (Gunakan format LRC atau baris biasa)</label>
+                    <span class="text-[8px] font-mono text-blue-400 font-bold">Gunakan template [mm:ss.xx]</span>
+                  </div>
+                  <textarea id="add-track-lyrics" rows="4" placeholder="Contoh:&#10;[00:02.00] (Pendahuluan Musik)&#10;[00:10.00] Di bawah langit senja melangkah tenang..." class="w-full bg-slate-950 border border-white/10 px-3 py-2 rounded-lg text-xs text-white outline-none focus:border-blue-400/50 font-mono resize-none"></textarea>
+                </div>
+
+                <!-- Gradient Cover Preset -->
+                <div class="space-y-1.5">
+                  <label class="text-[9px] font-mono tracking-wider font-extrabold text-slate-400 uppercase block">Desain Warna Sampul</label>
+                  <div class="flex items-center gap-2.5" id="add-track-cover-presets">
+                    <button data-cover="g-rose" class="w-7 h-7 rounded-lg bg-gradient-to-br from-rose-500 to-amber-500 border-2 border-white cursor-pointer active-cover shrink-0" title="Rose Sunset"></button>
+                    <button data-cover="g-emerald" class="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-700 border border-white/10 cursor-pointer shrink-0" title="Emerald Gopher"></button>
+                    <button data-cover="g-cyber" class="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 border border-white/10 cursor-pointer shrink-0" title="Cyber Indigo"></button>
+                    <button data-cover="g-matrix" class="w-7 h-7 rounded-lg bg-gradient-to-br from-slate-900 to-neutral-800 border border-white/10 cursor-pointer shrink-0" title="Space Charcoal"></button>
+                  </div>
+                </div>
+
+                <!-- Register additions -->
+                <button id="btn-add-custom-track" class="w-full py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 border border-emerald-500/20 uppercase font-bold text-[10px] tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-[0_0_15px_-4px_rgba(16,185,129,0.15)]">
+                  <i class="fa-solid fa-circle-plus"></i> DAFTARKAN LAGU KE PLAYLIST
+                </button>
+              </div>
             </div>
           </div>
         </section>
@@ -871,42 +1512,130 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             
-            <!-- Neon glow color modifiers -->
-            <div class="glow-border bg-slate-900/40 p-6 rounded-2xl space-y-6">
-              <h3 class="text-sm font-display font-black uppercase text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-palette text-blue-400"></i> Warna & Pendaran Neon Glow</h3>
-              
-              <div class="space-y-4 text-xs">
-                <!-- Primary neon set -->
-                <div class="space-y-2">
-                  <div class="flex justify-between items-center text-slate-400">
-                    <span>Main Neon Glow color</span>
-                    <input type="color" id="set-color-primary" value="#3b82f6" class="w-8 h-8 rounded border-none cursor-pointer bg-transparent outline-none" />
+            <div class="space-y-6">
+              <!-- Neon glow color modifiers -->
+              <div class="large-card space-y-6">
+                <h3 class="text-sm font-display font-black uppercase text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-palette text-blue-400"></i> Warna & Pendaran Neon Glow</h3>
+                
+                <div class="space-y-4 text-xs">
+                  <!-- Primary neon set -->
+                  <div class="space-y-2">
+                    <div class="flex justify-between items-center text-slate-400">
+                      <span>Main Neon Glow color</span>
+                      <input type="color" id="set-color-primary" value="#3b82f6" class="w-8 h-8 rounded border-none cursor-pointer bg-transparent outline-none" />
+                    </div>
+                    <p class="text-[10px] text-slate-400">Mempengaruhi pendaran tepi (border-glow) sekunder, ikon tombol, dan judul utama.</p>
                   </div>
-                  <p class="text-[10px] text-slate-400">Mempengaruhi pendaran tepi (border-glow) sekunder, ikon tombol, dan judul utama.</p>
-                </div>
 
-                <!-- Secondary neon set -->
-                <div class="space-y-2">
-                  <div class="flex justify-between items-center text-slate-400">
-                    <span>Accent Neon Glow color</span>
-                    <input type="color" id="set-color-secondary" value="#10b981" class="w-8 h-8 rounded border-none cursor-pointer bg-transparent outline-none" />
+                  <!-- Secondary neon set -->
+                  <div class="space-y-2">
+                    <div class="flex justify-between items-center text-slate-400">
+                      <span>Accent Neon Glow color</span>
+                      <input type="color" id="set-color-secondary" value="#10b981" class="w-8 h-8 rounded border-none cursor-pointer bg-transparent outline-none" />
+                    </div>
+                    <p class="text-[10px] text-slate-400">Mempengaruhi tautan, mode sukses, indikator telemetri, dan detail kalender.</p>
                   </div>
-                  <p class="text-[10px] text-slate-400">Mempengaruhi tautan, mode sukses, indikator telemetri, dan detail kalender.</p>
-                </div>
 
-                <!-- Glow Intensity Slider -->
-                <div class="space-y-1.5 pt-2">
-                  <div class="flex justify-between items-center text-slate-400">
-                    <span>Intensitas Pendaran (Glow factor)</span>
-                    <span id="label-glow-intensity" class="font-mono text-blue-400 font-bold">45%</span>
+                  <!-- Glow Intensity Slider -->
+                  <div class="space-y-1.5 pt-2">
+                    <div class="flex justify-between items-center text-slate-400">
+                      <span>Intensitas Pendaran (Glow factor)</span>
+                      <span id="label-glow-intensity" class="font-mono text-blue-400 font-bold">45%</span>
+                    </div>
+                    <input type="range" id="slider-glow-intensity" min="10" max="90" value="45" class="w-full h-1 bg-slate-950 appearance-none cursor-pointer outline-none accent-blue-400" />
                   </div>
-                  <input type="range" id="slider-glow-intensity" min="10" max="90" value="45" class="w-full h-1 bg-slate-950 appearance-none cursor-pointer outline-none accent-blue-400" />
+                </div>
+              </div>
+
+              <!-- Preset Tema Gradasi (2 Dark Mode, 2 Light Mode) -->
+              <div class="large-card space-y-4">
+                <h3 class="text-sm font-display font-black uppercase text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-wand-magic-sparkles text-emerald-400"></i> Preset Tema & Gradasi</h3>
+                <p class="text-[10px] text-slate-400">Pilih dari preset gradasi premium yang dioptimasi untuk visual Anda:</p>
+                
+                <div class="grid grid-cols-2 gap-3" id="theme-presets-container">
+                  <!-- Theme 1: Dark Classic Cosmic -->
+                  <button type="button" data-preset="theme-dk-classic" class="theme-preset-card group p-3 text-left rounded-xl border border-white/10 hover:border-blue-500/55 bg-slate-950/60 transition-all cursor-pointer">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-xs font-bold text-slate-100">Cosmic Blue</span>
+                      <span class="text-[7px] uppercase px-1 py-0.5 rounded bg-blue-500/10 text-blue-400 font-mono font-bold tracking-widest">Dark</span>
+                    </div>
+                    <div class="flex gap-1.5">
+                      <span class="w-4 h-4 rounded-full bg-slate-950 border border-white/20 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-blue-500 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-violet-600 inline-block"></span>
+                    </div>
+                  </button>
+
+                  <!-- Theme 2: Dark Emerald Cyber -->
+                  <button type="button" data-preset="theme-dk-emerald" class="theme-preset-card group p-3 text-left rounded-xl border border-white/10 hover:border-emerald-500/55 bg-slate-950/60 transition-all cursor-pointer">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-xs font-bold text-slate-100">Emerald Cyber</span>
+                      <span class="text-[7px] uppercase px-1 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-mono font-bold tracking-widest">Dark</span>
+                    </div>
+                    <div class="flex gap-1.5">
+                      <span class="w-4 h-4 rounded-full bg-stone-950 border border-white/20 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-emerald-500 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-cyan-400 inline-block"></span>
+                    </div>
+                  </button>
+
+                  <!-- Theme 3: Light Sakura Dawn -->
+                  <button type="button" data-preset="theme-lt-sakura" class="theme-preset-card group p-3 text-left rounded-xl border border-slate-200 hover:border-rose-500/55 bg-rose-50/40 transition-all cursor-pointer">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-xs font-bold text-slate-800">Sakura Dawn</span>
+                      <span class="text-[7px] uppercase px-1 py-0.5 rounded bg-rose-500/10 text-rose-500 font-mono font-bold tracking-widest">Light</span>
+                    </div>
+                    <div class="flex gap-1.5">
+                      <span class="w-4 h-4 rounded-full bg-rose-50 border border-stone-300 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-rose-500 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-orange-400 inline-block"></span>
+                    </div>
+                  </button>
+
+                  <!-- Theme 4: Light Nordic Mint -->
+                  <button type="button" data-preset="theme-lt-nordic" class="theme-preset-card group p-3 text-left rounded-xl border border-slate-200 hover:border-sky-500/55 bg-sky-50/40 transition-all cursor-pointer">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-xs font-bold text-slate-800">Nordic Mint</span>
+                      <span class="text-[7px] uppercase px-1 py-0.5 rounded bg-sky-500/10 text-sky-400 font-mono font-bold tracking-widest">Light</span>
+                    </div>
+                    <div class="flex gap-1.5">
+                      <span class="w-4 h-4 rounded-full bg-sky-50 border border-stone-300 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-sky-500 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-teal-500 inline-block"></span>
+                    </div>
+                  </button>
+
+                  <!-- Theme 5: Dark Rose Crimson -->
+                  <button type="button" data-preset="theme-dk-rosered" class="theme-preset-card group p-3 text-left rounded-xl border border-white/10 hover:border-rose-500/55 bg-slate-950/60 transition-all cursor-pointer">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-xs font-bold text-slate-100">Rose Crimson</span>
+                      <span class="text-[7px] uppercase px-1 py-0.5 rounded bg-rose-500/10 text-rose-400 font-mono font-bold tracking-widest">Dark</span>
+                    </div>
+                    <div class="flex gap-1.5">
+                      <span class="w-4 h-4 rounded-full bg-rose-950 border border-white/20 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-rose-500 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-amber-600 inline-block"></span>
+                    </div>
+                  </button>
+
+                  <!-- Theme 6: Light Rose Velvet -->
+                  <button type="button" data-preset="theme-lt-rosered" class="theme-preset-card group p-3 text-left rounded-xl border border-slate-200 hover:border-rose-500/55 bg-rose-50/40 transition-all cursor-pointer">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-xs font-bold text-slate-800">Rose Velvet</span>
+                      <span class="text-[7px] uppercase px-1 py-0.5 rounded bg-rose-500/10 text-rose-500 font-mono font-bold tracking-widest">Light</span>
+                    </div>
+                    <div class="flex gap-1.5">
+                      <span class="w-4 h-4 rounded-full bg-rose-100 border border-stone-300 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-rose-500 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-pink-400 inline-block"></span>
+                    </div>
+                  </button>
                 </div>
               </div>
             </div>
 
             <!-- Profile Customizer settings -->
-            <div class="glow-border bg-slate-900/40 p-6 rounded-2xl space-y-6">
+            <div class="large-card space-y-6">
               <h3 class="text-sm font-display font-black uppercase text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-user-edit text-blue-400"></i> Konfigurasi Penjelajah</h3>
               
               <form id="form-update-profile" class="space-y-4 text-xs">

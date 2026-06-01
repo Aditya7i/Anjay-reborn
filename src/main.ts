@@ -478,19 +478,96 @@ let memoryFlipped: number[] = [];
 let memoryMatchedCount = 0;
 let memoryScore = 0;
 
+interface EmbeddedTrack {
+  id: string;
+  title: string;
+  artist: string;
+  lyrics: string;
+  coverPreset: string; // 'g-rose', 'g-emerald', 'g-cyber', 'g-matrix'
+  isProcedural: boolean;
+  audioBlobUrl?: string;
+  filename?: string;
+}
+
+const DEFAULT_LYRICS_1 = `[00:00.00] (Instrumental Intro - Kehangatan Gelombang Retro)
+[00:05.00] Lampu neon berkelip lambat di ujung malam
+[00:10.00] Kode tumpuk beradu dalam tenang dan kelam
+[00:15.00] Kompilasi Go mengalir lewat jalur memori
+[00:20.00] Menyimpan seluruh rasa yang singgah hari ini
+[00:25.00] Oooh, simfoni biner mulai bernyanyi
+[00:30.00] Menuntun larik demi larik hingga pagi menjelang
+[00:36.00] Detik jam dinding berdetak tanpa henti
+[00:41.00] Jurnal lo-fi ini kan ku simpan abadi
+[00:47.00] (Instrumental Outro - Fade out ke hening)`;
+
+const DEFAULT_LYRICS_2 = `[00:00.00] (Intro - Angin sepoi instrumentasi synthesizer, 88bpm)
+[00:08.00] Derau angin malam menyapa sunyi kamar ini
+[00:14.00] Layar biru menyala memantulkan mimpi-mimpi
+[00:20.00] Baris string lirik menari gemulai di sunyinya hati
+[00:26.00] Berharap semua rindu kan terbebas esok pagi
+[00:32.00] Kita hanyalah rangkaian node dalam luas semesta
+[00:38.00] Mencari frekuensi yang selaras selamanya
+[00:44.00] (Instrumental Melodi - Transisi lembut)`;
+
+const DEFAULT_LYRICS_3 = `[00:00.00] (Sintesis kosmik - Keheningan galaksi)
+[00:06.00] Berjalan di antara bungkusan paket data
+[00:11.00] Melayang tanpa bobot bersama lirik lofi
+[00:17.00] Detak drum menuntun hati menyeka air mata
+[00:22.00] Di bawah langit senja digital yang abadi
+[00:28.00] Selesaikan kompilasi, raih kebahagiaan sejati
+[00:34.00] (Tuning frekuensi - Keluar dari orbit)`;
+
+const seededDefaultTracks: EmbeddedTrack[] = [
+  {
+    id: 'lofi-track-1',
+    title: 'Resonansi Logbook WebAssembly',
+    artist: 'The Gopher Loops',
+    lyrics: DEFAULT_LYRICS_1,
+    coverPreset: 'g-cyber',
+    isProcedural: true
+  },
+  {
+    id: 'lofi-track-2',
+    title: 'Hening Sandi Malam',
+    artist: 'Neon Cyber',
+    lyrics: DEFAULT_LYRICS_2,
+    coverPreset: 'g-rose',
+    isProcedural: true
+  },
+  {
+    id: 'lofi-track-3',
+    title: 'Langkah Kosmik',
+    artist: 'Vibe Gopher',
+    lyrics: DEFAULT_LYRICS_3,
+    coverPreset: 'g-emerald',
+    isProcedural: true
+  }
+];
+
 // Continuous audio states
 const bgAudioNode = new Audio();
-let audioPlaylist: Record<string, string> = {}; // map filenames to Object URLs
-let activePlaylistArr: string[] = [];
-let musicPlayingTrack: string | null = null;
+let activeTracksList: EmbeddedTrack[] = [...seededDefaultTracks];
+let musicPlayingTrackId: string | null = null;
 let musicPlayingState = false;
+let currentSimulatedTime = 0;
+let simulatedDuration = 180;
+let currentParsedLyrics: any[] = [];
+let simulatedPlaybackTimer: any = null;
+let selectedAddCover = 'g-rose';
+let isShuffleMode = false;
+let isRepeatMode = false;
 
 document.addEventListener('DOMContentLoaded', () => {
   // Setup standard clock uptime loops
   startDashboardChronosTicker();
   initializeStorageAndCache();
   registerDOMEventHandlers();
-  drawSVGAnalyticsLinesChart();
+  drawWeeklyTasksChart();
+  initializeTugasFeatures();
+
+  // Initial active track visuals and queue lists
+  renderActivePlayerVisuals();
+  renderMainPlaylistDomQueue();
 });
 
 // Load variables from local caches
@@ -509,20 +586,13 @@ function initializeStorageAndCache() {
   const lblChimeVol = document.getElementById('label-speaker-volume');
   if (lblChimeVol) lblChimeVol.textContent = `${chimeVol}%`;
 
-  // Custom Neon Colors settings load
-  const pColor = localStorage.getItem('neon_primary') || '#3b82f6';
-  const sColor = localStorage.getItem('neon_secondary') || '#10b981';
-  const glowInt = localStorage.getItem('neon_glow_intensity') || '45';
-
-  const pickerP = document.getElementById('set-color-primary') as HTMLInputElement;
-  const pickerS = document.getElementById('set-color-secondary') as HTMLInputElement;
+  // Theme Presets and custom settings load
+  const savedPreset = localStorage.getItem('ambient_theme_preset') || 'theme-dk-classic';
   const sliderG = document.getElementById('slider-glow-intensity') as HTMLInputElement;
-
-  if (pickerP) pickerP.value = pColor;
-  if (pickerS) pickerS.value = sColor;
+  const glowInt = localStorage.getItem('neon_glow_intensity') || '45';
   if (sliderG) sliderG.value = glowInt;
 
-  applyInteractiveCSSVariables(pColor, sColor, Number(glowInt));
+  applyThemePreset(savedPreset, true);
 
   // Calendar agenda items loading
   agendasStore = JSON.parse(localStorage.getItem('agendas_store') || '[]');
@@ -530,6 +600,19 @@ function initializeStorageAndCache() {
   // Diary items load
   diarySheets = JSON.parse(localStorage.getItem('diary_sheets') || '[]');
   renderDiarySheetsHistory();
+
+  // Load custom music tracks or fallback to default
+  const savedTracks = localStorage.getItem('custom_tracks_metadata');
+  if (savedTracks) {
+    try {
+      const parsed = JSON.parse(savedTracks);
+      activeTracksList = [...seededDefaultTracks, ...parsed];
+    } catch (e) {
+      activeTracksList = [...seededDefaultTracks];
+    }
+  } else {
+    activeTracksList = [...seededDefaultTracks];
+  }
 
   // Initialize TicTacToe
   resetTicTacToeGame();
@@ -575,6 +658,71 @@ function applyInteractiveCSSVariables(primary: string, secondary: string, intens
 
   const labelInt = document.getElementById('label-glow-intensity');
   if (labelInt) labelInt.textContent = `${intensity}%`;
+}
+
+function applyThemePreset(themeId: string, initLoad: boolean = false) {
+  const body = document.body;
+  // Remove any pre-existing theme- classes on body dynamically
+  body.className.split(' ').forEach(cls => {
+    if (cls.startsWith('theme-')) {
+      body.classList.remove(cls);
+    }
+  });
+  body.classList.add(themeId);
+  
+  let primary = '#3b82f6';
+  let secondary = '#10b981';
+  
+  if (themeId === 'theme-dk-classic') {
+    primary = '#3b82f6';
+    secondary = '#8b5cf6';
+  } else if (themeId === 'theme-dk-emerald') {
+    primary = '#10b981';
+    secondary = '#06b6d4';
+  } else if (themeId === 'theme-dk-rosered') {
+    primary = '#f43f5e';
+    secondary = '#fb7185';
+  } else if (themeId === 'theme-lt-sakura') {
+    primary = '#f43f5e';
+    secondary = '#fb923c';
+  } else if (themeId === 'theme-lt-nordic') {
+    primary = '#0ea5e9';
+    secondary = '#14b8a6';
+  } else if (themeId === 'theme-lt-rosered') {
+    primary = '#e11d48';
+    secondary = '#f43f5e';
+  }
+
+  if (initLoad) {
+    primary = localStorage.getItem('neon_primary') || primary;
+    secondary = localStorage.getItem('neon_secondary') || secondary;
+  }
+  
+  const pickerP = document.getElementById('set-color-primary') as HTMLInputElement;
+  const pickerS = document.getElementById('set-color-secondary') as HTMLInputElement;
+  if (pickerP) pickerP.value = primary;
+  if (pickerS) pickerS.value = secondary;
+  
+  const slideGlow = document.getElementById('slider-glow-intensity') as HTMLInputElement;
+  const valGlow = slideGlow ? Number(slideGlow.value) : 45;
+  applyInteractiveCSSVariables(primary, secondary, valGlow);
+  
+  localStorage.setItem('ambient_theme_preset', themeId);
+  
+  document.querySelectorAll('.theme-preset-card').forEach(btn => {
+    const preset = btn.getAttribute('data-preset');
+    if (preset === themeId) {
+      btn.classList.add('border-blue-500', 'ring-2', 'ring-blue-500/20');
+      btn.classList.remove('border-white/10', 'border-slate-200');
+    } else {
+      btn.classList.remove('border-blue-500', 'ring-2', 'ring-blue-500/20');
+      if (preset?.startsWith('theme-lt')) {
+        btn.classList.add('border-slate-200');
+      } else {
+        btn.classList.add('border-white/10');
+      }
+    }
+  });
 }
 
 
@@ -853,16 +1001,19 @@ function registerDOMEventHandlers() {
     btn.addEventListener('click', () => {
       // Remove selected classes
       navBtns.forEach(b => {
-        b.setAttribute('class', 'nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-semibold tracking-wider transition-all text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer');
+        b.setAttribute('class', 'nav-item flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-center text-[10px] sm:text-xs font-bold tracking-wider transition-all text-slate-400 hover:text-white hover:bg-white/5 cursor-pointer flex-1');
       });
-      btn.setAttribute('class', 'nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-semibold tracking-wider transition-all text-blue-400 bg-blue-500/10 cursor-pointer');
+      btn.setAttribute('class', 'nav-item flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-center text-[10px] sm:text-xs font-bold tracking-wider transition-all text-blue-400 bg-blue-500/15 border border-blue-500/10 cursor-pointer text-glow flex-1');
 
       const targetTab = btn.getAttribute('data-tab');
       panels.forEach(p => p.classList.add('hidden'));
 
       if (targetTab === 'tab-panel-dashboard') {
         document.getElementById('panel-dashboard')?.classList.remove('hidden');
-        drawSVGAnalyticsLinesChart();
+        drawWeeklyTasksChart();
+      } else if (targetTab === 'tab-panel-tugas') {
+        document.getElementById('panel-tugas')?.classList.remove('hidden');
+        updateTugasUI();
       } else if (targetTab === 'tab-panel-calendar') {
         document.getElementById('panel-calendar')?.classList.remove('hidden');
         renderCalendarGrid();
@@ -1244,120 +1395,234 @@ function registerDOMEventHandlers() {
 
 
   // =========================================================================
-  // 8. CONTINUOUS LO-FI PULSE MUSIC PLAYER CONTROLLERS
+  // 8. CONTINUOUS LO-FI PULSE MUSIC PLAYER CONTROLLERS (High-Fidelity Lyrics Synth)
   // =========================================================================
   const btnMusicPlay = document.getElementById('btn-music-play');
   const progressSlider = document.getElementById('music-tracker-slider') as HTMLInputElement;
+  const volumeSlider = document.getElementById('music-volume-slider') as HTMLInputElement;
 
-  btnMusicPlay?.addEventListener('click', toggleLoFiStreamAction);
-
-  function toggleLoFiStreamAction() {
-    if (activePlaylistArr.length === 0) {
-      window.spawnToast?.('warning', 'Belum Ada Lagu', 'Muat file .MP3 buatan Anda menggunakan tombol Muat File!');
+  btnMusicPlay?.addEventListener('click', () => {
+    if (activeTracksList.length === 0) {
+      window.spawnToast?.('warning', 'Belum Ada Lagu', 'Daftarkan lagu baru di form tambah lagu!');
       return;
     }
 
-    if (!musicPlayingTrack) {
-      musicPlayingTrack = activePlaylistArr[0];
+    if (!musicPlayingTrackId) {
+      musicPlayingTrackId = activeTracksList[0].id;
     }
 
     if (musicPlayingState) {
-      bgAudioNode.pause();
-      musicPlayingState = false;
-      renderActivePlayerVisuals();
+      pausePlayingMusicTrack();
     } else {
-      const urlSrc = audioPlaylist[musicPlayingTrack];
-      if (bgAudioNode.src !== urlSrc) {
-        bgAudioNode.src = urlSrc;
-      }
-      bgAudioNode.play().then(() => {
-        musicPlayingState = true;
-        renderActivePlayerVisuals();
-      }).catch(err => {
-        window.spawnToast?.('error', 'Audio Error', 'Pemutaran audio diblokir. Harap coba lagi atau muat ulang browser.');
-        console.error(err);
-      });
+      playSelectedTrack(musicPlayingTrackId);
     }
-  }
+  });
 
   // Next and Previous tracks triggers
   document.getElementById('btn-music-prev')?.addEventListener('click', () => {
-    if (activePlaylistArr.length === 0) return;
-    const idx = musicPlayingTrack ? activePlaylistArr.indexOf(musicPlayingTrack) : 0;
-    const prevIdx = (idx - 1 + activePlaylistArr.length) % activePlaylistArr.length;
-    musicPlayingTrack = activePlaylistArr[prevIdx];
-    
-    bgAudioNode.src = audioPlaylist[musicPlayingTrack];
-    musicPlayingState = true;
-    bgAudioNode.play();
-    renderActivePlayerVisuals();
-    window.spawnToast?.('info', 'Trek Sebelumnya', `Memutar: ${musicPlayingTrack}`);
+    executePrevAudioTrack();
   });
 
   document.getElementById('btn-music-next')?.addEventListener('click', () => {
-    executeNextAudioTrack();
+    executeNextAudioTrack(false);
   });
 
-  function executeNextAudioTrack() {
-    if (activePlaylistArr.length === 0) return;
-    const idx = musicPlayingTrack ? activePlaylistArr.indexOf(musicPlayingTrack) : 0;
-    const nextIdx = (idx + 1) % activePlaylistArr.length;
-    musicPlayingTrack = activePlaylistArr[nextIdx];
-    
-    bgAudioNode.src = audioPlaylist[musicPlayingTrack];
-    musicPlayingState = true;
-    bgAudioNode.play();
-    renderActivePlayerVisuals();
-    window.spawnToast?.('info', 'Trek Berikutnya', `Memutar: ${musicPlayingTrack}`);
-  }
+  // Shuffle & Repeat toggles
+  document.getElementById('btn-music-shuffle')?.addEventListener('click', () => {
+    isShuffleMode = !isShuffleMode;
+    updateShuffleRepeatButtons();
+    window.spawnToast?.('info', isShuffleMode ? 'Shuffle Aktif' : 'Shuffle Nonaktif', isShuffleMode ? 'Daftar putar akan dimainkan secara acak.' : 'Daftar putar dimainkan sesuai urutan.');
+  });
 
-  // Audio Progress Tracker Slider binds
+  document.getElementById('btn-music-repeat')?.addEventListener('click', () => {
+    isRepeatMode = !isRepeatMode;
+    updateShuffleRepeatButtons();
+    window.spawnToast?.('info', isRepeatMode ? 'Repeat Aktif' : 'Repeat Nonaktif', isRepeatMode ? 'Lagu yang sedang berjalan akan diulang terus menerus.' : 'Lagu berikutnya akan berjalan otomatis.');
+  });
+
+  // Inline add track button inside player block
+  document.getElementById('btn-inline-open-add')?.addEventListener('click', () => {
+    if (modalAddTrack) {
+      modalAddTrack.classList.remove('opacity-0', 'pointer-events-none');
+    }
+  });
+
+  // Initialize button styles
+  updateShuffleRepeatButtons();
+
+  // Progress Bar scrubbing
   progressSlider?.addEventListener('input', () => {
-    if (bgAudioNode.duration) {
+    const track = activeTracksList.find(t => t.id === musicPlayingTrackId);
+    if (!track) return;
+
+    if (track.isProcedural) {
+      currentSimulatedTime = (Number(progressSlider.value) / 100) * simulatedDuration;
+      handleTimeTicksUpdate(currentSimulatedTime, simulatedDuration);
+    } else if (bgAudioNode.duration) {
       const dest = (Number(progressSlider.value) / 100) * bgAudioNode.duration;
       bgAudioNode.currentTime = dest;
     }
   });
 
-  // Track progress updating hooks
-  bgAudioNode.addEventListener('timeupdate', () => {
-    const lblCur = document.getElementById('music-time-current');
-    const lblDur = document.getElementById('music-time-duration');
-    if (lblCur) lblCur.textContent = formatAudioTiming(bgAudioNode.currentTime);
-    
-    if (lblDur && bgAudioNode.duration) {
-      lblDur.textContent = formatAudioTiming(bgAudioNode.duration);
-    }
-
-    if (progressSlider && bgAudioNode.duration) {
-      progressSlider.value = ((bgAudioNode.currentTime / bgAudioNode.duration) * 100).toString();
-    }
-  });
-
-  bgAudioNode.addEventListener('ended', () => {
-    executeNextAudioTrack(); // Auto loop skips next!
-  });
-
-  // Volume adjuster bindings
-  const volumeSlider = document.getElementById('music-volume-slider') as HTMLInputElement;
+  // Volume slider
   volumeSlider?.addEventListener('input', () => {
     bgAudioNode.volume = Number(volumeSlider.value) / 100;
   });
 
-  // Local File Loading triggers
-  const uploaderFile = document.getElementById('music-file-uploader') as HTMLInputElement;
-  uploaderFile?.addEventListener('change', (ev: any) => {
-    const filesList = ev.target.files;
-    if (!filesList || filesList.length === 0) return;
+  // Native audio tag updates
+  bgAudioNode.addEventListener('timeupdate', () => {
+    const track = activeTracksList.find(t => t.id === musicPlayingTrackId);
+    if (track && !track.isProcedural) {
+      handleTimeTicksUpdate(bgAudioNode.currentTime, bgAudioNode.duration || 120);
+    }
+  });
 
-    for (const f of filesList) {
-      const objUrl = URL.createObjectURL(f);
-      audioPlaylist[f.name] = objUrl;
-      if (!activePlaylistArr.includes(f.name)) {
-        activePlaylistArr.push(f.name);
+  bgAudioNode.addEventListener('ended', () => {
+    executeNextAudioTrack(true);
+  });
+
+  // Cover presets selection buttons trigger in add track form
+  const coverBtns = document.querySelectorAll('#add-track-cover-presets button');
+  coverBtns.forEach(btn => {
+    btn.addEventListener('click', (ev) => {
+      coverBtns.forEach(b => {
+        b.classList.remove('active-cover', 'border-2', 'border-white');
+        b.classList.add('border', 'border-white/10');
+      });
+      const targ = ev.currentTarget as HTMLElement;
+      targ.classList.remove('border-white/10');
+      targ.classList.add('active-cover', 'border-2', 'border-white');
+      selectedAddCover = targ.getAttribute('data-cover') || 'g-rose';
+    });
+  });
+
+  // File selected trigger label update
+  const addTrackFileField = document.getElementById('add-track-file') as HTMLInputElement;
+  const addTrackFileLabel = document.getElementById('add-track-file-label');
+  addTrackFileField?.addEventListener('change', () => {
+    if (addTrackFileField.files && addTrackFileField.files.length > 0) {
+      if (addTrackFileLabel) {
+        addTrackFileLabel.textContent = `TERPILIH: ${addTrackFileField.files[0].name.toUpperCase()}`;
+      }
+    } else {
+      if (addTrackFileLabel) {
+        addTrackFileLabel.textContent = 'PILIH FILE MP3...';
       }
     }
-    window.spawnToast?.('success', 'Media loaded successfully ✅', `${filesList.length} Trek Audio diintegrasikan ke playlist.`);
+  });
+
+  // Modal toggle for Adding Tracks and Lyrics
+  const modalAddTrack = document.getElementById('modal-add-track');
+  const btnOpenAddTrack = document.getElementById('btn-open-add-track');
+  const btnCloseAddTrack = document.getElementById('btn-close-add-track');
+
+  // Modal toggle for Playlist Queue
+  const modalPlaylistQueue = document.getElementById('modal-playlist-queue');
+  const btnToggleQueue = document.getElementById('btn-toggle-queue');
+  const btnCloseQueue = document.getElementById('btn-close-queue');
+
+  const openQueueModal = () => {
+    if (modalPlaylistQueue) {
+      modalPlaylistQueue.classList.remove('opacity-0', 'pointer-events-none');
+    }
+  };
+
+  const closeQueueModal = () => {
+    if (modalPlaylistQueue) {
+      modalPlaylistQueue.classList.add('opacity-0', 'pointer-events-none');
+    }
+  };
+
+  btnToggleQueue?.addEventListener('click', openQueueModal);
+  btnCloseQueue?.addEventListener('click', closeQueueModal);
+
+  modalPlaylistQueue?.addEventListener('click', (e) => {
+    if (e.target === modalPlaylistQueue) {
+      closeQueueModal();
+    }
+  });
+
+  btnOpenAddTrack?.addEventListener('click', () => {
+    // Hide queue modal if open
+    closeQueueModal();
+    // Open add track modal
+    if (modalAddTrack) {
+      modalAddTrack.classList.remove('opacity-0', 'pointer-events-none');
+    }
+  });
+
+  const closeAddTrackModal = () => {
+    if (modalAddTrack) {
+      modalAddTrack.classList.add('opacity-0', 'pointer-events-none');
+    }
+  };
+
+  btnCloseAddTrack?.addEventListener('click', closeAddTrackModal);
+
+  // Close when clicking outside of the card content
+  modalAddTrack?.addEventListener('click', (e) => {
+    if (e.target === modalAddTrack) {
+      closeAddTrackModal();
+    }
+  });
+
+  // "+" Add Track trigger
+  document.getElementById('btn-add-custom-track')?.addEventListener('click', () => {
+    const inputTitle = document.getElementById('add-track-title') as HTMLInputElement;
+    const inputArtist = document.getElementById('add-track-artist') as HTMLInputElement;
+    const inputLyrics = document.getElementById('add-track-lyrics') as HTMLTextAreaElement;
+
+    const title = inputTitle?.value?.trim();
+    const artist = inputArtist?.value?.trim() || 'Synth Gopher';
+    const lyrics = inputLyrics?.value?.trim() || 'Lirik instrumental...';
+
+    if (!title) {
+      window.spawnToast?.('warning', 'Judul Kosong', 'Harap masukkan judul lagu sebelum mendaftarkan trek!');
+      return;
+    }
+
+    const file = addTrackFileField?.files ? addTrackFileField.files[0] : null;
+
+    // Create a new track object
+    const newTrack: EmbeddedTrack = {
+      id: 'custom-track-' + Date.now(),
+      title: title,
+      artist: artist,
+      lyrics: lyrics,
+      coverPreset: selectedAddCover,
+      isProcedural: !file,
+      audioBlobUrl: file ? URL.createObjectURL(file) : undefined,
+      filename: file ? file.name : undefined
+    };
+
+    activeTracksList.push(newTrack);
+
+    // Save custom list to local storage (filter out blob for serialization)
+    const customMetadataOnly = activeTracksList.filter(t => t.id.startsWith('custom-track-')).map(t => ({
+      id: t.id,
+      title: t.title,
+      artist: t.artist,
+      lyrics: t.lyrics,
+      coverPreset: t.coverPreset,
+      isProcedural: t.isProcedural,
+      filename: t.filename
+    }));
+
+    localStorage.setItem('custom_tracks_metadata', JSON.stringify(customMetadataOnly));
+
+    window.spawnToast?.('success', 'Trek Berhasil Diterima ✅', `Lagu "${title}" dimasukkan ke playlist!`);
+
+    // Reset fields
+    if (inputTitle) inputTitle.value = '';
+    if (inputArtist) inputArtist.value = '';
+    if (inputLyrics) inputLyrics.value = '';
+    if (addTrackFileField) addTrackFileField.value = '';
+    if (addTrackFileLabel) addTrackFileLabel.textContent = 'PILIH FILE MP3...';
+
+    // Close the entry modal
+    closeAddTrackModal();
+
+    // Rerender tracklist queue
     renderMainPlaylistDomQueue();
   });
 
@@ -1379,6 +1644,25 @@ function registerDOMEventHandlers() {
 
   slideGlow?.addEventListener('input', () => {
     applyInteractiveCSSVariables(colorPickerP.value, colorPickerS.value, Number(slideGlow.value));
+  });
+
+  // Bind Preset Theme Card clicks
+  document.querySelectorAll('.theme-preset-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const preset = btn.getAttribute('data-preset');
+      if (preset) {
+        applyThemePreset(preset);
+        const nameMap: Record<string, string> = {
+          'theme-dk-classic': 'Dark Cosmic Blue',
+          'theme-dk-emerald': 'Dark Emerald Cyber',
+          'theme-dk-rosered': 'Dark Rose Crimson',
+          'theme-lt-sakura': 'Light Sakura Dawn',
+          'theme-lt-nordic': 'Light Nordic Mint',
+          'theme-lt-rosered': 'Light Rose Velvet'
+        };
+        window.spawnToast?.('success', 'Tema Diubah ✨', `Preset ${nameMap[preset] || preset} diaktifkan.`);
+      }
+    });
   });
 
   // Profile update form submissives
@@ -1570,12 +1854,12 @@ function renderDiarySheetsHistory() {
   if (!container) return;
 
   if (diarySheets.length === 0) {
-    container.innerHTML = `<div class="italic text-slate-500 text-xs text-center py-20 bg-slate-900/10 rounded-xl glow-border">Belum ada lembaran diary. Buat di sebelah kiri!</div>`;
+    container.innerHTML = `<div class="smallmid-card italic text-slate-500 text-xs text-center py-20 bg-slate-900/10">Belum ada lembaran diary. Buat di sebelah kiri!</div>`;
     return;
   }
 
   container.innerHTML = diarySheets.map(s => `
-    <div class="p-4 bg-slate-900/60 hover:bg-slate-900 border border-white/5 hover:border-blue-400/20 rounded-2xl cursor-pointer transition-all space-y-2 relative group" onclick="window.diaryLoadSheetAction('${s.id}')">
+    <div class="small-card cursor-pointer space-y-2 relative group" onclick="window.diaryLoadSheetAction('${s.id}')">
       <div class="flex items-center justify-between gap-2">
         <h4 class="font-bold text-xs text-white truncate pr-6">${s.title}</h4>
         <button class="absolute top-4 right-4 text-slate-500 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-all" onclick="event.stopPropagation(); window.diaryDeleteSheetAction('${s.id}')">
@@ -1819,13 +2103,88 @@ function renderSlidingGridState(arr: any[]) {
 
 
 // --- ACTIVE PLAYERS VIEW CONTROLLERS ---
+interface ParsedLyricLine {
+  time: number; // in seconds
+  text: string;
+}
+
+function parseLyrics(lyricText: string): ParsedLyricLine[] {
+  const lines = lyricText.split('\n');
+  const result: ParsedLyricLine[] = [];
+  const timeRegex = /\[(\d+):(\d+)(?:\.(\d+))?\]/;
+  
+  for (let l of lines) {
+    l = l.trim();
+    if (!l) continue;
+    
+    const match = timeRegex.exec(l);
+    if (match) {
+      const minutes = parseInt(match[1], 10);
+      const seconds = parseInt(match[2], 10);
+      const ms = match[3] ? parseInt(match[3], 10) : 0;
+      const totalSeconds = minutes * 60 + seconds + ms / 100;
+      const text = l.replace(timeRegex, '').trim();
+      result.push({ time: totalSeconds, text });
+    } else {
+      result.push({ time: -1, text: l });
+    }
+  }
+  
+  const timedLines = result.filter(r => r.time >= 0);
+  if (timedLines.length > 0) {
+    return timedLines.sort((a, b) => a.time - b.time);
+  }
+  
+  // Linear interpolation fallback
+  return result.map((r, idx) => ({
+    time: idx * 6,
+    text: r.text
+  }));
+}
+
+function renderTrackLyrics(track: EmbeddedTrack) {
+  const scroller = document.getElementById('lyrics-display-scroller');
+  if (!scroller) return;
+  
+  const parsed = parseLyrics(track.lyrics);
+  currentParsedLyrics = parsed;
+  
+  if (parsed.length === 0) {
+    scroller.innerHTML = `
+      <div class="text-slate-500 text-xs font-mono py-16 text-center">
+        Tidak ada lirik terpasang pada trek ini.
+      </div>
+    `;
+    return;
+  }
+  
+  scroller.innerHTML = parsed.map((item, idx) => {
+    return `
+      <p id="lyric-line-${idx}" class="lyric-line text-[15px] sm:text-xl font-medium text-slate-400 transition-all duration-300 select-none py-2 transform hover:scale-102 cursor-pointer" onclick="window.seekToLyricTime(${item.time})">
+        ${item.text}
+      </p>
+    `;
+  }).join('');
+  
+  scroller.scrollTop = 0;
+}
+
 function renderActivePlayerVisuals() {
   const textTitle = document.getElementById('music-track-title');
+  const textArtist = document.getElementById('music-track-artist');
   const artworkDisc = document.getElementById('music-disc-artwork');
   const btnPlay = document.getElementById('btn-music-play');
+  const sourceBadge = document.getElementById('music-source-badge');
+  const lyricsStatusBadge = document.getElementById('music-lyrics-status-badge');
+
+  const activeTrack = activeTracksList.find(t => t.id === musicPlayingTrackId);
 
   if (textTitle) {
-    textTitle.textContent = musicPlayingTrack || 'Tidak Ada Trek Terpilih';
+    textTitle.textContent = activeTrack ? activeTrack.title : 'Tidak Ada Lagu Terpilih';
+  }
+
+  if (textArtist) {
+    textArtist.textContent = activeTrack ? activeTrack.artist : 'Silakan pilih lagu dari daftar putar';
   }
 
   if (btnPlay) {
@@ -1834,80 +2193,515 @@ function renderActivePlayerVisuals() {
       : '<i class="fa-solid fa-play translate-x-0.5"></i>';
   }
 
+  if (sourceBadge) {
+    if (activeTrack) {
+      sourceBadge.textContent = activeTrack.isProcedural ? 'Sintesis Musik' : 'Audio MP3';
+      sourceBadge.className = activeTrack.isProcedural
+        ? 'px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
+        : 'px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border border-purple-500/30 bg-purple-500/10 text-purple-400';
+    } else {
+      sourceBadge.textContent = 'Siap';
+      sourceBadge.className = 'px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border border-white/10 bg-white/5 text-slate-400';
+    }
+  }
+
+  if (lyricsStatusBadge) {
+    lyricsStatusBadge.textContent = activeTrack ? 'Lirik Aktif' : 'Musik Saja';
+  }
+
   if (artworkDisc) {
+    artworkDisc.className = "w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center relative shadow-2xl overflow-hidden transition-all duration-300 shrink-0 border border-white/10";
+    
+    if (activeTrack) {
+      if (activeTrack.coverPreset === 'g-rose') {
+        artworkDisc.classList.add('bg-gradient-to-br', 'from-rose-500', 'to-amber-500');
+      } else if (activeTrack.coverPreset === 'g-emerald') {
+        artworkDisc.classList.add('bg-gradient-to-br', 'from-emerald-400', 'to-teal-700');
+      } else if (activeTrack.coverPreset === 'g-cyber') {
+        artworkDisc.classList.add('bg-gradient-to-br', 'from-purple-600', 'to-blue-500');
+      } else {
+        artworkDisc.classList.add('bg-gradient-to-br', 'from-slate-940', 'to-neutral-800');
+      }
+    } else {
+      artworkDisc.classList.add('bg-gradient-to-br', 'from-rose-500', 'via-purple-600', 'to-indigo-600');
+    }
+
     if (musicPlayingState) {
       artworkDisc.classList.add('animate-spin');
-      artworkDisc.style.animationDuration = '8s';
+      artworkDisc.style.animationDuration = '12s';
     } else {
       artworkDisc.classList.remove('animate-spin');
     }
   }
+
+  if (activeTrack) {
+    renderTrackLyrics(activeTrack);
+  } else {
+    const scroller = document.getElementById('lyrics-display-scroller');
+    if (scroller) {
+      scroller.innerHTML = `
+        <div class="text-slate-500 text-xs font-mono py-16 text-center">
+          Lirik lagu akan tampil otomatis saat trek audio dimainkan.
+        </div>
+      `;
+    }
+  }
+}
+
+function updateShuffleRepeatButtons() {
+  const btnShuffle = document.getElementById('btn-music-shuffle');
+  const btnRepeat = document.getElementById('btn-music-repeat');
+  
+  if (btnShuffle) {
+    if (isShuffleMode) {
+      btnShuffle.className = 'w-9 h-9 flex items-center justify-center bg-emerald-500/20 hover:bg-emerald-500/30 rounded-xl text-emerald-400 border border-emerald-500/30 font-bold transition-all text-xs cursor-pointer shadow-[0_0_10px_rgba(16,185,129,0.15)]';
+    } else {
+      btnShuffle.className = 'w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-all text-xs cursor-pointer border border-white/5';
+    }
+  }
+
+  if (btnRepeat) {
+    if (isRepeatMode) {
+      btnRepeat.className = 'w-9 h-9 flex items-center justify-center bg-emerald-500/20 hover:bg-emerald-500/30 rounded-xl text-emerald-400 border border-emerald-500/30 font-bold transition-all text-xs cursor-pointer shadow-[0_0_10px_rgba(16,185,129,0.15)]';
+    } else {
+      btnRepeat.className = 'w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-all text-xs cursor-pointer border border-white/5';
+    }
+  }
+}
+
+function executePrevAudioTrack() {
+  if (activeTracksList.length === 0) return;
+  
+  let prevIdx = 0;
+  if (isShuffleMode) {
+    if (activeTracksList.length > 1) {
+      const currentIdx = musicPlayingTrackId ? activeTracksList.findIndex(t => t.id === musicPlayingTrackId) : -1;
+      do {
+        prevIdx = Math.floor(Math.random() * activeTracksList.length);
+      } while (prevIdx === currentIdx);
+    } else {
+      prevIdx = 0;
+    }
+  } else {
+    const idx = musicPlayingTrackId ? activeTracksList.findIndex(t => t.id === musicPlayingTrackId) : 0;
+    prevIdx = (idx - 1 + activeTracksList.length) % activeTracksList.length;
+  }
+
+  playSelectedTrack(activeTracksList[prevIdx].id);
+  window.spawnToast?.('info', 'Lagu Sebelumnya', `Memutar: ${activeTracksList[prevIdx].title}`);
+}
+
+function executeNextAudioTrack(isAuto: boolean = false) {
+  if (activeTracksList.length === 0) return;
+
+  if (isAuto && isRepeatMode && musicPlayingTrackId) {
+    playSelectedTrack(musicPlayingTrackId);
+    return;
+  }
+
+  let nextIdx = 0;
+  if (isShuffleMode) {
+    if (activeTracksList.length > 1) {
+      const currentIdx = musicPlayingTrackId ? activeTracksList.findIndex(t => t.id === musicPlayingTrackId) : -1;
+      do {
+        nextIdx = Math.floor(Math.random() * activeTracksList.length);
+      } while (nextIdx === currentIdx);
+    } else {
+      nextIdx = 0;
+    }
+  } else {
+    const idx = musicPlayingTrackId ? activeTracksList.findIndex(t => t.id === musicPlayingTrackId) : -1;
+    nextIdx = (idx + 1) % activeTracksList.length;
+  }
+
+  playSelectedTrack(activeTracksList[nextIdx].id);
+  window.spawnToast?.('info', 'Lagu Berikutnya', `Memutar: ${activeTracksList[nextIdx].title}`);
 }
 
 function renderMainPlaylistDomQueue() {
   const container = document.getElementById('music-playlist-queue');
-  if (!container) return;
+  const counter = document.getElementById('music-queue-counter');
+  
+  const inlineContainer = document.getElementById('music-inline-playlist-queue');
+  const inlineCounter = document.getElementById('music-inline-queue-counter');
 
-  if (activePlaylistArr.length === 0) {
-    container.innerHTML = `
-      <div class="text-center italic text-slate-500 text-xs py-16">
-        <p>Belum ada media terdaftar.</p>
-        <p class="mt-1 text-[10px]">Silakan muat file audio lokal milik Anda (MP3) menggunakan tombol di atas!</p>
-      </div>
-    `;
-    return;
+  const totalTracks = activeTracksList.length;
+
+  if (counter) {
+    counter.textContent = `${totalTracks} Lagu`;
+  }
+  if (inlineCounter) {
+    inlineCounter.textContent = `${totalTracks} Lagu`;
   }
 
-  container.innerHTML = activePlaylistArr.map((name, i) => {
-    const isPlaying = musicPlayingTrack === name;
-    let cardClass = `px-4 py-3.5 rounded-xl border flex items-center gap-3 cursor-pointer transition-all hover:bg-slate-900/60 `;
-    
-    if (isPlaying) {
-      cardClass += 'border-blue-500/30 bg-blue-500/10 text-white font-bold';
+  // --- 1. POPULATE POPUP / MODAL LIST ---
+  if (container) {
+    if (totalTracks === 0) {
+      container.innerHTML = `
+        <div class="text-center italic text-slate-500 text-xs py-16">
+          <p>Belum ada media terdaftar.</p>
+          <p class="mt-1 text-[10px]">Silakan pakai form tambah lagu di bawah untuk merancang playlist baru!</p>
+        </div>
+      `;
     } else {
-      cardClass += 'border-white/5 bg-slate-950/20 text-slate-400';
+      container.innerHTML = activeTracksList.map((track, i) => {
+        const isPlaying = musicPlayingTrackId === track.id;
+        let cardClass = `px-3.5 py-3 rounded-xl border flex items-center gap-3 cursor-pointer transition-all duration-200 hover:bg-slate-900/60 `;
+        
+        if (isPlaying) {
+          cardClass += 'border-emerald-500/30 bg-emerald-500/10 text-white font-bold';
+        } else {
+          cardClass += 'border-white/5 bg-slate-950/20 text-slate-400 hover:border-white/10';
+        }
+
+        const speakerIcon = isPlaying && musicPlayingState 
+          ? '<i class="fa-solid fa-waveform animate-pulse text-emerald-400"></i>' 
+          : `<span class="font-mono text-[10px] opacity-40">${i + 1}</span>`;
+
+        let coverStyle = '';
+        if (track.coverPreset === 'g-rose') coverStyle = 'from-rose-500 to-amber-500';
+        else if (track.coverPreset === 'g-emerald') coverStyle = 'from-emerald-400 to-teal-700';
+        else if (track.coverPreset === 'g-cyber') coverStyle = 'from-purple-600 to-blue-500';
+        else coverStyle = 'from-slate-900 to-neutral-800';
+
+        return `
+          <div class="${cardClass}" onclick="window.musicPlaySelectedTrackAction('${track.id}')">
+            <div class="w-8 h-8 bg-gradient-to-br ${coverStyle} rounded-lg shrink-0 flex items-center justify-center border border-white/10 relative shadow">
+              <div class="absolute inset-2 rounded-full border border-white/5"></div>
+              <div class="absolute inset-1.5 bg-slate-950/60 rounded-full flex items-center justify-center scale-90">${speakerIcon}</div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-xs font-bold ${isPlaying ? 'text-emerald-400' : 'text-slate-200'}">${track.title}</p>
+              <p class="truncate text-[10px] text-slate-500 font-mono">${track.artist} • ${track.isProcedural ? 'Synth' : 'Audio'}</p>
+            </div>
+            <button class="text-slate-500 hover:text-red-400 shrink-0 text-xs p-1 transition-colors" onclick="event.stopPropagation(); window.musicRemoveTrackFromQueue('${track.id}')">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        `;
+      }).join('');
     }
+  }
 
-    const speakerIcon = isPlaying && musicPlayingState 
-      ? '<i class="fa-solid fa-waveform animate-pulse text-blue-400"></i>' 
-      : `<span class="font-mono text-[10px] opacity-40">${i + 1}</span>`;
+  // --- 2. POPULATE INLINE PLAYLIST LIST (Next Playing inside Card) ---
+  if (inlineContainer) {
+    if (totalTracks === 0) {
+      inlineContainer.innerHTML = `
+        <div class="text-center italic text-slate-500 text-xs py-16">
+          <p>Belum ada lagu.</p>
+        </div>
+      `;
+    } else {
+      inlineContainer.innerHTML = activeTracksList.map((track, i) => {
+        const isPlaying = musicPlayingTrackId === track.id;
+        let cardClass = `px-2 py-1.5 rounded-lg border flex items-center gap-2 cursor-pointer transition-all duration-150 hover:bg-slate-900/80 `;
+        
+        if (isPlaying) {
+          cardClass += 'border-emerald-500/20 bg-emerald-500/5 text-white font-semibold';
+        } else {
+          cardClass += 'border-white/5 bg-slate-950/40 text-slate-400 hover:border-white/10';
+        }
 
-    return `
-      <div class="${cardClass}" onclick="window.musicPlaySelectedTrackAction('${name}')">
-        <div class="w-6 h-6 flex items-center justify-center bg-white/5 rounded-lg shrink-0">${speakerIcon}</div>
-        <span class="truncate text-xs flex-1">${name}</span>
-        <button class="text-slate-500 hover:text-red-400 shrink-0 text-[10px]" onclick="event.stopPropagation(); window.musicRemoveTrackFromQueue('${name}')">
-          <i class="fa-solid fa-trash-can"></i>
-        </button>
-      </div>
-    `;
-  }).join('');
+        const speakerIcon = isPlaying && musicPlayingState 
+          ? '<i class="fa-solid fa-waveform animate-pulse text-emerald-400"></i>' 
+          : `<span class="font-mono text-[9px] opacity-40">${i + 1}</span>`;
+
+        let coverStyle = '';
+        if (track.coverPreset === 'g-rose') coverStyle = 'from-rose-500 to-amber-500';
+        else if (track.coverPreset === 'g-emerald') coverStyle = 'from-emerald-400 to-teal-700';
+        else if (track.coverPreset === 'g-cyber') coverStyle = 'from-purple-600 to-blue-500';
+        else coverStyle = 'from-slate-900 to-neutral-800';
+
+        return `
+          <div class="${cardClass}" onclick="window.musicPlaySelectedTrackAction('${track.id}')">
+            <div class="w-6 h-6 bg-gradient-to-br ${coverStyle} rounded-md shrink-0 flex items-center justify-center border border-white/5 relative shadow">
+              <div class="absolute inset-[1px] bg-slate-950/70 rounded-md flex items-center justify-center scale-95">${speakerIcon}</div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-[10px] font-bold ${isPlaying ? 'text-emerald-400' : 'text-slate-200'}">${track.title}</p>
+              <p class="truncate text-[9px] text-slate-500 font-mono">${track.artist}</p>
+            </div>
+            <button class="text-slate-600 hover:text-red-400 shrink-0 text-xs p-1 transition-colors" onclick="event.stopPropagation(); window.musicRemoveTrackFromQueue('${track.id}')" title="Hapus">
+              <i class="fa-solid fa-trash-can text-[9px]"></i>
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+  }
 }
 
-(window as any).musicPlaySelectedTrackAction = (name: string) => {
-  musicPlayingTrack = name;
-  bgAudioNode.src = audioPlaylist[name];
+function playSelectedTrack(trackId: string) {
+  const track = activeTracksList.find(t => t.id === trackId);
+  if (!track) return;
+
+  musicPlayingTrackId = trackId;
   musicPlayingState = true;
-  bgAudioNode.play().then(() => {
-    renderActivePlayerVisuals();
-    renderMainPlaylistDomQueue();
-    window.spawnToast?.('success', 'Music Playing 🔊', `Trek audio diaktifkan: ${name}`);
-  });
-};
 
-(window as any).musicRemoveTrackFromQueue = (name: string) => {
-  activePlaylistArr = activePlaylistArr.filter(x => x !== name);
-  delete audioPlaylist[name];
-  
-  if (musicPlayingTrack === name) {
-    bgAudioNode.pause();
-    musicPlayingTrack = null;
-    musicPlayingState = false;
-  }
-
-  window.spawnToast?.('warning', 'Trek Dihapus', 'File audio dibersihkan dari pointer heap.');
   renderActivePlayerVisuals();
   renderMainPlaylistDomQueue();
+
+  stopSimulatedTimer();
+  stopProceduralSynthMelody();
+
+  if (track.isProcedural) {
+    bgAudioNode.pause();
+    currentSimulatedTime = 0;
+    
+    const parsed = parseLyrics(track.lyrics);
+    currentParsedLyrics = parsed;
+    const maxT = parsed.length > 0 ? Math.max(...parsed.map(p => p.time)) : 0;
+    simulatedDuration = maxT > 0 ? maxT + 12 : 120;
+
+    startProceduralSynthMelody();
+    startSimulatedTimer();
+
+    window.spawnToast?.('success', 'Synth Mode Aktif 🔊', `Sintesis audio instrumental untuk lagu: ${track.title}`);
+  } else {
+    if (track.audioBlobUrl) {
+      bgAudioNode.src = track.audioBlobUrl;
+      const parsed = parseLyrics(track.lyrics);
+      currentParsedLyrics = parsed;
+
+      bgAudioNode.play().then(() => {
+        window.spawnToast?.('success', 'Memulai Musik 🔊', `Trek audio lokal diaktifkan: ${track.title}`);
+      }).catch(err => {
+        window.spawnToast?.('error', 'Audio Diblokir', 'Silakan klik layar browser sekali untuk membuka izin pemutaran media.');
+        console.error(err);
+      });
+    } else {
+      window.spawnToast?.('warning', 'Berkas Heap Berakhir', `Pointer audio MP3 kustom "${track.title}" kedaluwarsa. Mode Fallback Synthesizer Lo-Fi diaktifkan.`);
+      track.isProcedural = true;
+      playSelectedTrack(trackId);
+    }
+  }
+}
+
+function pausePlayingMusicTrack() {
+  musicPlayingState = false;
+  renderActivePlayerVisuals();
+  stopProceduralSynthMelody();
+  stopSimulatedTimer();
+  bgAudioNode.pause();
+}
+
+function startSimulatedTimer() {
+  stopSimulatedTimer();
+  simulatedPlaybackTimer = setInterval(() => {
+    if (musicPlayingState) {
+      currentSimulatedTime += 1;
+      if (currentSimulatedTime >= simulatedDuration) {
+        currentSimulatedTime = simulatedDuration;
+        stopSimulatedTimer();
+        
+        // Auto Play Next
+        executeNextAudioTrack(true);
+      } else {
+        handleTimeTicksUpdate(currentSimulatedTime, simulatedDuration);
+      }
+    }
+  }, 1000);
+}
+
+function stopSimulatedTimer() {
+  if (simulatedPlaybackTimer) {
+    clearInterval(simulatedPlaybackTimer);
+    simulatedPlaybackTimer = null;
+  }
+}
+
+function handleTimeTicksUpdate(currentTime: number, duration: number) {
+  const lblCur = document.getElementById('music-time-current');
+  const lblDur = document.getElementById('music-time-duration');
+  const progressSlider = document.getElementById('music-tracker-slider') as HTMLInputElement;
+
+  if (lblCur) lblCur.textContent = formatAudioTiming(currentTime);
+  if (lblDur) lblDur.textContent = formatAudioTiming(duration);
+
+  if (progressSlider && duration) {
+    progressSlider.value = ((currentTime / duration) * 100).toString();
+  }
+
+  highlightLyricsAt(currentTime);
+}
+
+function highlightLyricsAt(currentTime: number) {
+  const scroller = document.getElementById('lyrics-display-scroller');
+  if (!scroller || currentParsedLyrics.length === 0) return;
+
+  let activeIdx = -1;
+  for (let i = 0; i < currentParsedLyrics.length; i++) {
+    if (currentTime >= currentParsedLyrics[i].time) {
+      activeIdx = i;
+    }
+  }
+
+  currentParsedLyrics.forEach((_, idx) => {
+    const el = document.getElementById(`lyric-line-${idx}`);
+    if (el) {
+      if (idx === activeIdx) {
+        el.className = 'lyric-line text-lg sm:text-2xl font-black text-emerald-400 py-2.5 transition-all duration-150 cursor-pointer scale-105 select-none text-glow-secondary';
+      } else {
+        el.className = 'lyric-line text-[15px] sm:text-xl font-medium text-slate-400 py-2 transition-all duration-150 cursor-pointer opacity-60 hover:opacity-100 hover:text-white select-none';
+      }
+    }
+  });
+
+  const activeLineEl = document.getElementById(`lyric-line-${activeIdx}`);
+  if (activeLineEl) {
+    const scrollerHeight = scroller.clientHeight;
+    const elementTop = activeLineEl.offsetTop;
+    const elementHeight = activeLineEl.clientHeight;
+    scroller.scrollTo({
+      top: elementTop - scrollerHeight / 2 + elementHeight / 2,
+      behavior: 'smooth'
+    });
+  }
+}
+
+let proceduralSynthInterval: any = null;
+function startProceduralSynthMelody() {
+  stopProceduralSynthMelody();
+  playProceduralLofiNotes();
+  proceduralSynthInterval = setInterval(() => {
+    if (musicPlayingState) {
+      playProceduralLofiNotes();
+    }
+  }, 4000);
+}
+
+function stopProceduralSynthMelody() {
+  if (proceduralSynthInterval) {
+    clearInterval(proceduralSynthInterval);
+    proceduralSynthInterval = null;
+  }
+}
+
+function playProceduralLofiNotes() {
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+    }
+    const now = ctx.currentTime;
+    
+    const chordIndex = Math.floor(currentSimulatedTime / 8) % 4;
+    let freqs = [261.63, 329.63, 392.00, 493.88]; // Cmaj7
+    if (chordIndex === 1) freqs = [220.00, 261.63, 329.63, 392.00]; // Am7
+    else if (chordIndex === 2) freqs = [174.61, 220.00, 261.63, 329.63]; // Fmaj7
+    else if (chordIndex === 3) freqs = [196.00, 246.94, 293.66, 349.23]; // G7
+    
+    // Lowpass filter for warm vibes
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(450, now);
+    filter.Q.setValueAtTime(1.0, now);
+    
+    const masterGainNode = ctx.createGain();
+    const playerVol = Number((document.getElementById('music-volume-slider') as HTMLInputElement)?.value || 70);
+    masterGainNode.gain.setValueAtTime((playerVol / 100) * 0.08, now);
+    
+    filter.connect(masterGainNode);
+    masterGainNode.connect(ctx.destination);
+    
+    // Sub bass notes
+    const subOsc = ctx.createOscillator();
+    subOsc.type = 'sine';
+    subOsc.frequency.setValueAtTime(freqs[0] / 2, now);
+    const subGain = ctx.createGain();
+    subGain.gain.setValueAtTime(0.3, now);
+    subGain.gain.exponentialRampToValueAtTime(0.001, now + 3.8);
+    subOsc.connect(subGain);
+    subGain.connect(filter);
+    subOsc.start(now);
+    subOsc.stop(now + 4.0);
+
+    // Soft arpeggiated lo-fi chords keys
+    freqs.forEach((f, idx) => {
+      const osc = ctx.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(f, now + idx * 0.15);
+      
+      const oscGain = ctx.createGain();
+      oscGain.gain.setValueAtTime(0, now);
+      oscGain.gain.linearRampToValueAtTime(0.12, now + idx * 0.15 + 0.3);
+      oscGain.gain.exponentialRampToValueAtTime(0.001, now + 3.5);
+      
+      osc.connect(oscGain);
+      oscGain.connect(filter);
+      
+      osc.start(now);
+      osc.stop(now + 4.0);
+    });
+
+    // Simulated soft analog tape static/crackle bursts
+    const crackleCount = 4;
+    for (let i = 0; i < crackleCount; i++) {
+      const crackleTime = now + Math.random() * 3.8;
+      const crackleOsc = ctx.createOscillator();
+      crackleOsc.type = 'square';
+      crackleOsc.frequency.setValueAtTime(100 + Math.random() * 210, crackleTime);
+      const crackleGain = ctx.createGain();
+      crackleGain.gain.setValueAtTime(0.012, crackleTime);
+      crackleGain.gain.exponentialRampToValueAtTime(0.0001, crackleTime + 0.02);
+      crackleOsc.connect(crackleGain);
+      crackleGain.connect(ctx.destination);
+      crackleOsc.start(crackleTime);
+      crackleOsc.stop(crackleTime + 0.03);
+    }
+  } catch (err) {
+    console.error("Synthesizer audio fail:", err);
+  }
+}
+
+(window as any).musicPlaySelectedTrackAction = (trackId: string) => {
+  playSelectedTrack(trackId);
+  const qModal = document.getElementById('modal-playlist-queue');
+  if (qModal) {
+    qModal.classList.add('opacity-0', 'pointer-events-none');
+  }
+};
+
+(window as any).musicRemoveTrackFromQueue = (trackId: string) => {
+  const isPlayingDeleted = musicPlayingTrackId === trackId;
+  const deletedTrack = activeTracksList.find(t => t.id === trackId);
+
+  activeTracksList = activeTracksList.filter(t => t.id !== trackId);
+
+  if (isPlayingDeleted) {
+    pausePlayingMusicTrack();
+    musicPlayingTrackId = null;
+  }
+
+  if (trackId.startsWith('custom-track-')) {
+    const customMetadataOnly = activeTracksList.filter(t => t.id.startsWith('custom-track-')).map(t => ({
+      id: t.id,
+      title: t.title,
+      artist: t.artist,
+      lyrics: t.lyrics,
+      coverPreset: t.coverPreset,
+      isProcedural: t.isProcedural,
+      filename: t.filename
+    }));
+    localStorage.setItem('custom_tracks_metadata', JSON.stringify(customMetadataOnly));
+  }
+
+  window.spawnToast?.('warning', 'Trek Dihapus', `Lagu "${deletedTrack ? deletedTrack.title : ''}" telah dibersihkan.`);
+  
+  renderActivePlayerVisuals();
+  renderMainPlaylistDomQueue();
+};
+
+(window as any).seekToLyricTime = (seconds: number) => {
+  if (seconds < 0) return;
+  const track = activeTracksList.find(t => t.id === musicPlayingTrackId);
+  if (!track) return;
+  if (track.isProcedural) {
+    currentSimulatedTime = seconds;
+    handleTimeTicksUpdate(seconds, simulatedDuration);
+  } else {
+    bgAudioNode.currentTime = seconds;
+  }
 };
 
 function formatAudioTiming(seconds: number): string {
@@ -1919,105 +2713,412 @@ function formatAudioTiming(seconds: number): string {
 
 
 // =========================================================================
-// 11. DYNAMIC SVG ANALYTICS LINES CHART (Alternative to Recharts)
+// 11. DYNAMIC SVG WEEKLY TASKS ANNOTATED CHART (Alternative to Recharts)
 // =========================================================================
-function drawSVGAnalyticsLinesChart() {
-  const container = document.getElementById('vanilla-chart-container');
+function drawWeeklyTasksChart() {
+  const container = document.getElementById('weekly-tasks-chart-container');
   if (!container) return;
 
   const w = container.clientWidth || 550;
-  const h = 208; // matching height class h-52
+  const h = 224; // matching class height
 
-  // Simulated live log numbers data array
-  const points1 = [35, 45, 60, 40, 80, 50, 95, 75, 110]; // Register hashing speed lines
-  const points2 = [15, 30, 22, 54, 38, 45, 60, 52, 70];  // Calendar loops activity metrics
-  const points3 = [70, 65, 80, 75, 90, 85, 110, 105, 125]; // Audio play streams
+  // Gather actual task counts by day of the week, plus base seeds for display fidelity
+  const completedTaskCount = (typeof userTasks !== 'undefined') ? userTasks.filter(t => t.completed).length : 0;
+  const totalTasks = (typeof userTasks !== 'undefined') ? userTasks.length : 0;
+  const basePoints = [2, 3, 1, 4, 2, 5, 3];
+  
+  // Make the peaks reflect user's real task inputs
+  const points = basePoints.map((val, idx) => {
+    return val + Math.min(completedTaskCount, idx + 1);
+  });
 
-  const totalSegments = points1.length - 1;
-  const xMultiplier = (w - 30) / totalSegments;
+  const daysLabel = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const maxVal = Math.max(...points, 8);
+  const totalSegments = points.length - 1;
+  const xMultiplier = (w - 60) / totalSegments;
 
-  // Render responsive SVG segments directly as string
   let svgMarkup = `
     <svg class="absolute inset-0 w-full h-full" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
       <defs>
-        <linearGradient id="opt-grad-blue" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.3"/>
-          <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.0"/>
-        </linearGradient>
-        <linearGradient id="opt-grad-green" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#10b981" stop-opacity="0.2"/>
-          <stop offset="100%" stop-color="#10b981" stop-opacity="0.0"/>
+        <linearGradient id="opt-grad-rose" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--neon-primary, #f43f5e)" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="var(--neon-primary, #f43f5e)" stop-opacity="0.0"/>
         </linearGradient>
       </defs>
-
-      <!-- Draw Grid lines -->
-      <line x1="0" y1="${h * 0.25}" x2="${w}" y2="${h * 0.25}" stroke="rgba(255,255,255,0.05)" />
-      <line x1="0" y1="${h * 0.5}" x2="${w}" y2="${h * 0.5}" stroke="rgba(255,255,255,0.05)" />
-      <line x1="0" y1="${h * 0.75}" x2="${w}" y2="${h * 0.75}" stroke="rgba(255,255,255,0.05)" />
+      
+      <!-- Horizontal grid lines -->
+      <line x1="30" y1="${h * 0.25}" x2="${w - 30}" y2="${h * 0.25}" stroke="rgba(255,255,255,0.05)" stroke-dasharray="2" />
+      <line x1="30" y1="${h * 0.5}" x2="${w - 30}" y2="${h * 0.5}" stroke="rgba(255,255,255,0.05)" stroke-dasharray="2" />
+      <line x1="30" y1="${h * 0.75}" x2="${w - 30}" y2="${h * 0.75}" stroke="rgba(255,255,255,0.05)" stroke-dasharray="2" />
   `;
 
-  // Draw Area points 1 (Register)
-  let p1Coords = '';
-  let fill1Coords = `0,${h} `;
-  points1.forEach((val, index) => {
-    const xCoord = index * xMultiplier + 15;
-    const yCoord = h - (val / 150) * (h - 20) - 10;
-    p1Coords += `${xCoord},${yCoord} `;
-    fill1Coords += `${xCoord},${yCoord} `;
-  });
-  fill1Coords += `${w - 15},${h}`;
-
-  svgMarkup += `
-    <polygon points="${fill1Coords}" fill="url(#opt-grad-blue)" />
-    <polyline points="${p1Coords}" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" />
-  `;
-
-  // Draw Area points 2 (Calendar loops)
-  let p2Coords = '';
-  let fill2Coords = `0,${h} `;
-  points2.forEach((val, index) => {
-    const xCoord = index * xMultiplier + 15;
-    const yCoord = h - (val / 150) * (h - 20) - 10;
-    p2Coords += `${xCoord},${yCoord} `;
-    fill2Coords += `${xCoord},${yCoord} `;
-  });
-  fill2Coords += `${w - 15},${h}`;
-
-  svgMarkup += `
-    <polygon points="${fill2Coords}" fill="url(#opt-grad-green)" />
-    <polyline points="${p2Coords}" fill="none" stroke="#10b981" stroke-width="2.5" stroke-dasharray="3" stroke-linecap="round" />
-  `;
-
-  // Draw Line points 3 (Audio stream)
-  let p3Coords = '';
-  points3.forEach((val, index) => {
-    const xCoord = index * xMultiplier + 15;
-    const yCoord = h - (val / 150) * (h - 20) - 10;
-    p3Coords += `${xCoord},${yCoord} `;
-  });
-
-  svgMarkup += `
-    <polyline points="${p3Coords}" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" />
-  `;
-
-  // Plot circle markers on endpoints
-  const finalX = totalSegments * xMultiplier + 15;
-  const finalY1 = h - (points1[points1.length - 1] / 150) * (h - 20) - 10;
-  const finalY2 = h - (points2[points2.length - 1] / 150) * (h - 20) - 10;
+  let coords = '';
+  let areaCoords = `30,${h - 30} `;
   
+  points.forEach((val, index) => {
+    const xCoord = index * xMultiplier + 30;
+    const yCoord = h - 30 - (val / maxVal) * (h - 55);
+    coords += `${xCoord},${yCoord} `;
+    areaCoords += `${xCoord},${yCoord} `;
+    
+    svgMarkup += `
+      <text x="${xCoord}" y="${h - 10}" fill="rgba(255,255,255,0.4)" font-size="10" font-family="monospace" text-anchor="middle">${daysLabel[index]}</text>
+      <circle cx="${xCoord}" cy="${yCoord}" r="3.5" fill="var(--neon-primary, #f43f5e)" />
+      <text x="${xCoord}" y="${yCoord - 8}" fill="#ffffff" font-size="9" font-family="monospace" text-anchor="middle" font-weight="bold">${val}</text>
+    `;
+  });
+  
+  areaCoords += `${w - 30},${h - 30}`;
+
   svgMarkup += `
-    <circle cx="${finalX}" cy="${finalY1}" r="5" fill="#3b82f6" stroke="#ffffff" stroke-width="1.5" />
-    <circle cx="${finalX}" cy="${finalY2}" r="4.5" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+      <polygon points="${areaCoords}" fill="url(#opt-grad-rose)" />
+      <polyline points="${coords}" fill="none" stroke="var(--neon-primary, #f43f5e)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
     </svg>
   `;
 
   container.innerHTML = svgMarkup;
+
+  const statusEl = document.getElementById('weekly-chart-status');
+  if (statusEl) {
+    statusEl.innerText = `${completedTaskCount} / ${totalTasks} SELESAI`;
+  }
 }
 
 // Draw dynamically when window is resized for responsiveness
 window.addEventListener('resize', () => {
   const panelDash = document.getElementById('panel-dashboard');
   if (panelDash && !panelDash.classList.contains('hidden')) {
-    drawSVGAnalyticsLinesChart();
+    drawWeeklyTasksChart();
   }
 });
+
+
+// =========================================================================
+// 12. HIGH-FIDELITY TUGAS (TODO-LIST) DATA ENGINE & CAROUSEL MANAGER
+// =========================================================================
+
+interface UserTask {
+  id: string;
+  title: string;
+  date: string;
+  priority: 'Low' | 'Medium' | 'High';
+  completed: boolean;
+}
+
+let userTasks: UserTask[] = [];
+
+// Seed default tasks so view isn't dry on initial load
+const defaultSampleTasks: UserTask[] = [
+  { id: 't1', title: 'Belajar Fundamental Go WebAssembly (WASM)', date: '2026-05-30', priority: 'High', completed: false },
+  { id: 't2', title: 'Melakukan Tuning Audio pada Lofi Synth', date: '2026-05-31', priority: 'Medium', completed: true },
+  { id: 't3', title: 'Menulis Jurnal Logbook Mingguan', date: '2026-06-01', priority: 'Low', completed: false }
+];
+
+function initializeTugasFeatures() {
+  // Load tasks
+  const stored = localStorage.getItem('user_tasks');
+  if (stored) {
+    try {
+      userTasks = JSON.parse(stored);
+    } catch (e) {
+      userTasks = [...defaultSampleTasks];
+    }
+  } else {
+    userTasks = [...defaultSampleTasks];
+    localStorage.setItem('user_tasks', JSON.stringify(userTasks));
+  }
+  
+  // Bind Tasks creation buttons
+  const btnAddTask = document.getElementById('tugas-btn-add');
+  const inputTitle = document.getElementById('tugas-input-title') as HTMLInputElement;
+  const inputDate = document.getElementById('tugas-input-date') as HTMLInputElement;
+  
+  // Default values
+  if (inputDate) {
+    const today = new Date().toISOString().split('T')[0];
+    inputDate.value = today;
+  }
+  
+  // Handle priority selector
+  let selectedPriority: 'Low' | 'Medium' | 'High' = 'Low';
+  const priorityBtns = document.querySelectorAll('.tugas-priority-btn');
+  priorityBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      priorityBtns.forEach(b => {
+        b.setAttribute('class', 'tugas-priority-btn flex-1 py-1.5 px-2 rounded-lg text-[9px] font-black uppercase text-center bg-white/5 text-slate-400 border border-white/5 cursor-pointer');
+      });
+      
+      const p = btn.getAttribute('data-priority') as 'Low' | 'Medium' | 'High';
+      selectedPriority = p || 'Low';
+      
+      const themeColorClass = 
+        selectedPriority === 'High' ? 'bg-red-500/15 text-red-500 border-red-500/30' : 
+        selectedPriority === 'Medium' ? 'bg-amber-500/15 text-amber-500 border-amber-500/30' : 
+        'bg-teal-500/15 text-teal-400 border-teal-500/30';
+      
+      btn.setAttribute('class', `tugas-priority-btn flex-1 py-1.5 px-2 rounded-lg text-[9px] font-black uppercase text-center border cursor-pointer selected ${themeColorClass}`);
+    });
+  });
+
+  // Action listeners
+  btnAddTask?.addEventListener('click', () => {
+    const titleVal = inputTitle?.value.trim();
+    if (!titleVal) {
+      window.spawnToast?.('warning', 'Validasi Gagal ⚠️', 'Harap masukkan nama tugas terlebih dahulu.');
+      return;
+    }
+
+    const newTask: UserTask = {
+      id: 'task_' + Date.now(),
+      title: titleVal,
+      date: inputDate?.value || '',
+      priority: selectedPriority,
+      completed: false
+    };
+
+    userTasks.push(newTask);
+    localStorage.setItem('user_tasks', JSON.stringify(userTasks));
+    
+    if (inputTitle) inputTitle.value = '';
+    
+    updateTugasUI();
+    updateDashboardTodoStats();
+    drawWeeklyTasksChart();
+    
+    window.spawnToast?.('success', 'Tugas Tersimpan! ✨', `"${titleVal}" sukses ditambahkan ke agenda.`);
+  });
+
+  // Bind filter buttons
+  const filterBtns = document.querySelectorAll('.tugas-filter-btn');
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => {
+        b.setAttribute('class', 'tugas-filter-btn px-2 py-1 text-[9px] text-slate-400 font-extrabold uppercase cursor-pointer');
+      });
+      btn.setAttribute('class', 'tugas-filter-btn px-2 py-1 text-[9px] font-black uppercase text-blue-400 bg-blue-500/10 rounded-md cursor-pointer');
+      updateTugasUI();
+    });
+  });
+
+  // Bind secondary signout trigger on the bottom dock
+  document.getElementById('btn-signout-dock')?.addEventListener('click', () => {
+    localStorage.removeItem('user_session');
+    window.spawnToast?.('warning', 'Sesi Berakhir 🏮', 'Sesi handshake terputus. Silahkan login kembali.');
+    setTimeout(() => window.location.reload(), 1000);
+  });
+
+  // Bind carousel indicators & slide changers
+  const btnPrev = document.getElementById('hero-carousel-prev');
+  const btnNext = document.getElementById('hero-carousel-next');
+  
+  btnPrev?.addEventListener('click', () => {
+    currentHeroSlide = (currentHeroSlide - 1 + carouselSlidesData.length) % carouselSlidesData.length;
+    renderHeroSlide();
+  });
+  
+  btnNext?.addEventListener('click', () => {
+    currentHeroSlide = (currentHeroSlide + 1) % carouselSlidesData.length;
+    renderHeroSlide();
+  });
+
+  // Bind carousel dots manually
+  document.querySelectorAll('#hero-carousel-indicators span').forEach(span => {
+    span.addEventListener('click', () => {
+      const targetIdx = Number(span.getAttribute('data-slide') || 0);
+      currentHeroSlide = targetIdx;
+      renderHeroSlide();
+    });
+  });
+
+  // Initial render
+  updateTugasUI();
+  updateDashboardTodoStats();
+  drawWeeklyTasksChart();
+  renderHeroSlide();
+}
+
+const carouselSlidesData = [
+  {
+    title: "🎵 Pemutar Musik Lofi Lounge",
+    desc: "Unggah berkas MP3 favorit Anda secara lokal atau mainkan track lofi pilihan dengan kendali volume presisi, visualisasi gelombang digital, dan timeline responsif.",
+    sub: "[WASM Direct Stream Card • Buffer Optimization Enabled]",
+    badge: "AUDIO SHIELD ACTIVE"
+  },
+  {
+    title: "✍️ Aesthetic Journal Editor",
+    desc: "Abadikan momen harian Anda dengan antarmuka penulisan diary berbasis mockup kertas retro bergaris, desain kotak-kokok, stardust, atau plain dark.",
+    sub: "[Aesthetic Canvas Layout • Storage Sandbox Active]",
+    badge: "SANDBOX SECURE"
+  },
+  {
+    title: "📅 Interactive Calendar Planner",
+    desc: "Kelola semua agenda penting dan jadwal sholat modern GMT+7 yang disinkronisasi langsung menggunakan kernel sandbox Gopher runtime super cepat.",
+    sub: "[GMT+7 Scheduler Engine • Node Precision Sync]",
+    badge: "WASM SPEED ACTIVE"
+  }
+];
+
+let currentHeroSlide = 0;
+
+function renderHeroSlide() {
+  const container = document.getElementById('hero-carousel-viewport');
+  if (!container) return;
+  const slide = carouselSlidesData[currentHeroSlide];
+  
+  // Smooth animated transition class toggles
+  container.classList.add('opacity-0', 'scale-[0.98]');
+  setTimeout(() => {
+    container.innerHTML = `
+      <div class="relative transition-all duration-300">
+        <h2 class="text-xl sm:text-2xl font-black font-display text-white tracking-tight text-glow-secondary flex items-center gap-2">
+          ${slide.title}
+        </h2>
+        <p class="text-slate-300 text-xs sm:text-sm mt-2 leading-relaxed max-w-2xl font-body">
+          ${slide.desc}
+        </p>
+        <p class="text-[9px] md:text-[10px] font-mono tracking-wider text-slate-500 uppercase mt-4">
+          ${slide.sub}
+        </p>
+      </div>
+    `;
+    container.classList.remove('opacity-0', 'scale-[0.98]');
+    
+    // Update badge pill text
+    const parentContainer = container.closest('.large-card');
+    if (parentContainer) {
+      const badgePill = parentContainer.querySelector('.bg-blue-500\\/10') as HTMLElement;
+      if (badgePill) {
+        badgePill.innerText = slide.badge;
+      }
+    }
+  }, 120);
+
+  // Update indicators
+  const indicators = document.querySelectorAll('#hero-carousel-indicators span');
+  indicators.forEach((ind, idx) => {
+    if (idx === currentHeroSlide) {
+      ind.setAttribute('class', 'w-3 h-1.5 rounded-full bg-blue-500 transition-all cursor-pointer');
+    } else {
+      ind.setAttribute('class', 'w-1.5 h-1.5 rounded-full bg-white/20 transition-all cursor-pointer');
+    }
+  });
+}
+
+function updateTugasUI() {
+  const container = document.getElementById('tugas-list-items');
+  if (!container) return;
+
+  const activeBtn = document.querySelector('.tugas-filter-btn.bg-blue-500\\/10');
+  const activeFilter = activeBtn ? activeBtn.getAttribute('data-filter') : 'all';
+
+  let filtered = userTasks;
+  if (activeFilter === 'pending') {
+    filtered = userTasks.filter(t => !t.completed);
+  } else if (activeFilter === 'completed') {
+    filtered = userTasks.filter(t => t.completed);
+  }
+
+  // Sort: unfinished first, then priority levels, then date
+  filtered.sort((a, b) => {
+    if (a.completed !== b.completed) {
+      return a.completed ? 1 : -1;
+    }
+    const priorityWeight = { 'High': 3, 'Medium': 2, 'Low': 1 };
+    return priorityWeight[b.priority] - priorityWeight[a.priority];
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-12 text-slate-500 text-xs font-mono">
+        Belum ada tugas yang sesuai kategori "${activeFilter}".
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.map(task => {
+    const priorityClass = 
+      task.priority === 'High' ? 'bg-red-500/15 text-red-500 border-red-500/20' : 
+      task.priority === 'Medium' ? 'bg-amber-500/15 text-amber-500 border-amber-500/20' : 
+      'bg-teal-500/15 text-teal-400 border-teal-500/20';
+
+    return `
+      <div class="flex items-center justify-between p-3.5 bg-slate-900/60 border ${task.completed ? 'border-teal-500/20 opacity-75' : 'border-white/5'} rounded-xl hover:bg-slate-900/80 transition-all group">
+        <div class="flex items-center gap-3 min-w-0">
+          <input type="checkbox" class="tugas-toggle-cb w-4.5 h-4.5 rounded border-white/20 bg-slate-950 text-blue-500 focus:ring-0 cursor-pointer" data-id="${task.id}" ${task.completed ? 'checked' : ''} />
+          <div class="min-w-0">
+            <p class="text-xs font-bold text-white ${task.completed ? 'line-through text-slate-500' : ''} truncate">${task.title}</p>
+            <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+              <span class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border ${priorityClass}">${task.priority}</span>
+              ${task.date ? `<span class="text-[9px] font-mono text-slate-500"><i class="fa-regular fa-calendar text-[8px] mr-1"></i> ${task.date}</span>` : ''}
+            </div>
+          </div>
+        </div>
+        <button class="tugas-delete-btn p-1.5 text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all cursor-pointer" data-id="${task.id}" title="Hapus Tugas">
+          <i class="fa-regular fa-trash-can text-sm"></i>
+        </button>
+      </div>
+    `;
+  }).join('');
+
+  // Re-bind listeners for toggles and deletes
+  container.querySelectorAll('.tugas-toggle-cb').forEach(cb => {
+    cb.addEventListener('change', (e) => {
+      const id = cb.getAttribute('data-id');
+      const task = userTasks.find(t => t.id === id);
+      if (task) {
+        task.completed = (e.target as HTMLInputElement).checked;
+        localStorage.setItem('user_tasks', JSON.stringify(userTasks));
+        updateTugasUI();
+        updateDashboardTodoStats();
+        drawWeeklyTasksChart();
+        window.spawnToast?.('success', task.completed ? 'Tugas Selesai! 🎉' : 'Tugas Belum Selesai', `"${task.title}" disinkronisasikan.`);
+      }
+    });
+  });
+
+  container.querySelectorAll('.tugas-delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-id');
+      const idx = userTasks.findIndex(t => t.id === id);
+      if (idx !== -1) {
+        const title = userTasks[idx].title;
+        userTasks.splice(idx, 1);
+        localStorage.setItem('user_tasks', JSON.stringify(userTasks));
+        updateTugasUI();
+        updateDashboardTodoStats();
+        drawWeeklyTasksChart();
+        window.spawnToast?.('info', 'Tugas Dihapus 🗑️', `Tugas "${title}" berhasil dihapus.`);
+      }
+    });
+  });
+
+  // Track page badge counter
+  const badge = document.getElementById('tugas-counter-badge');
+  if (badge) {
+    const completedCount = userTasks.filter(t => t.completed).length;
+    badge.innerText = `${completedCount} Selesai`;
+  }
+  
+  // Track home dashboard quick stats counter
+  const dashCount = document.getElementById('dash-journal-count');
+  if (dashCount) {
+    // Let's count existing diary entries from local storage to show exact count!
+    const storedDiary = localStorage.getItem('user_journals') || '[]';
+    try {
+      const diaries = JSON.parse(storedDiary);
+      dashCount.innerText = String(diaries.length);
+    } catch(err) {
+      dashCount.innerText = '0';
+    }
+  }
+}
+
+function updateDashboardTodoStats() {
+  const total = userTasks.length;
+  const completed = userTasks.filter(t => t.completed).length;
+  const ratioEl = document.getElementById('dash-todo-ratio');
+  if (ratioEl) {
+    ratioEl.innerHTML = `${completed}<span class="text-slate-500 font-medium">/${total}</span>`;
+  }
+}
