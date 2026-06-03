@@ -670,8 +670,13 @@
 
           <!-- Quick Controls: Speaker popover and System Time -->
           <div class="flex items-center gap-2">
+            <!-- Simple Theme Toggle -->
+            <button id="btn-toggle-simple-theme" onclick="window.toggleSimpleTheme()" class="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 transition-all text-xs cursor-pointer focus:outline-none" title="Toggle Light/Dark Mode (Pure JS)">
+              <i class="fa-solid fa-moon"></i>
+            </button>
+
             <!-- Speaker Popover Trigger -->
-            <button id="btn-toggle-speaker" class="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 transition-all text-xs cursor-pointer" title="Konfigurasi Frekuensi & Volume Chime Speaker">
+            <button id="btn-toggle-speaker" class="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 transition-all text-xs cursor-pointer focus:outline-none" title="Konfigurasi Frekuensi & Volume Chime Speaker">
               <i class="fa-solid fa-volume-high"></i>
             </button>
 
@@ -1309,9 +1314,9 @@
                   </div>
                   
                   <!-- Display interactive lyrics view scrollable -->
-                  <div id="lyrics-display-scroller" class="flex-grow overflow-y-auto space-y-4 pr-1 text-center py-2 scroll-smooth" style="mask-image: linear-gradient(to bottom, transparent 0%, white 15%, white 85%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, white 15%, white 85%, transparent 100%);">
+                  <div id="lyrics-display-scroller" class="flex-grow overflow-y-auto space-y-4 pr-1 text-left py-2 scroll-smooth" style="mask-image: linear-gradient(to bottom, transparent 0%, white 15%, white 85%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, white 15%, white 85%, transparent 100%);">
                     <!-- Lyrics will be generated here -->
-                    <div class="text-slate-500 text-sm sm:text-base py-16">
+                    <div class="text-slate-500 text-sm sm:text-base py-16 ml-8 sm:ml-12">
                       Lirik lagu akan tampil otomatis saat musik dimainkan.
                     </div>
                   </div>
@@ -1553,81 +1558,81 @@
                 <p class="text-[10px] text-slate-400">Pilih dari preset gradasi premium yang dioptimasi untuk visual Anda:</p>
                 
                 <div class="grid grid-cols-2 gap-3" id="theme-presets-container">
-                  <!-- Theme 1: Dark Classic Cosmic -->
-                  <button type="button" data-preset="theme-dk-classic" class="theme-preset-card group p-3 text-left rounded-xl border border-white/10 hover:border-blue-500/55 bg-slate-950/60 transition-all cursor-pointer">
+                  <!-- Theme 1 -->
+                  <button type="button" data-preset="theme-stratosphere-iii" class="theme-preset-card group p-3 text-left rounded-xl border border-slate-200 hover:border-blue-500/55 bg-blue-50/40 transition-all cursor-pointer">
                     <div class="flex items-center justify-between mb-2">
-                      <span class="text-xs font-bold text-slate-100">Cosmic Blue</span>
-                      <span class="text-[7px] uppercase px-1 py-0.5 rounded bg-blue-500/10 text-blue-400 font-mono font-bold tracking-widest">Dark</span>
+                      <span class="text-xs font-bold text-slate-800">Stratosphere III</span>
+                      <span class="text-[7px] uppercase px-1 py-0.5 rounded bg-blue-500/10 text-blue-500 font-mono font-bold tracking-widest">Light</span>
+                    </div>
+                    <div class="flex gap-1.5">
+                      <span class="w-4 h-4 rounded-full border border-stone-300 inline-block" style="background:var(--primary-gradient)"></span>
+                      <span class="w-4 h-4 rounded-full bg-blue-500 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-[#ef5350] inline-block"></span>
+                    </div>
+                  </button>
+
+                  <!-- Theme 2 -->
+                  <button type="button" data-preset="theme-aurora-borealis-light" class="theme-preset-card group p-3 text-left rounded-xl border border-slate-200 hover:border-emerald-500/55 bg-emerald-50/40 transition-all cursor-pointer">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-xs font-bold text-slate-800">Aurora Light</span>
+                      <span class="text-[7px] uppercase px-1 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-mono font-bold tracking-widest">Light</span>
+                    </div>
+                    <div class="flex gap-1.5">
+                      <span class="w-4 h-4 rounded-full border border-stone-300 inline-block" style="background:var(--primary-gradient)"></span>
+                      <span class="w-4 h-4 rounded-full bg-emerald-500 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-[#f43f5e] inline-block"></span>
+                    </div>
+                  </button>
+
+                  <!-- Theme 3 -->
+                  <button type="button" data-preset="theme-andromeda-nebula" class="theme-preset-card group p-3 text-left rounded-xl border border-slate-200 hover:border-pink-500/55 bg-pink-50/40 transition-all cursor-pointer">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-xs font-bold text-slate-800">Andromeda Nebula</span>
+                      <span class="text-[7px] uppercase px-1 py-0.5 rounded bg-pink-500/10 text-pink-500 font-mono font-bold tracking-widest">Light</span>
+                    </div>
+                    <div class="flex gap-1.5">
+                      <span class="w-4 h-4 rounded-full border border-stone-300 inline-block" style="background:var(--primary-gradient)"></span>
+                      <span class="w-4 h-4 rounded-full bg-pink-500 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-purple-500 inline-block"></span>
+                    </div>
+                  </button>
+
+                  <!-- Theme 4 -->
+                  <button type="button" data-preset="theme-centauri-void" class="theme-preset-card group p-3 text-left rounded-xl border border-white/10 hover:border-cyan-500/55 bg-slate-950/60 transition-all cursor-pointer">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-xs font-bold text-slate-100">Centauri Void</span>
+                      <span class="text-[7px] uppercase px-1 py-0.5 rounded bg-cyan-500/10 text-cyan-400 font-mono font-bold tracking-widest">Dark</span>
                     </div>
                     <div class="flex gap-1.5">
                       <span class="w-4 h-4 rounded-full bg-slate-950 border border-white/20 inline-block"></span>
-                      <span class="w-4 h-4 rounded-full bg-blue-500 inline-block"></span>
-                      <span class="w-4 h-4 rounded-full bg-violet-600 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-cyan-400 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-sky-400 inline-block"></span>
                     </div>
                   </button>
 
-                  <!-- Theme 2: Dark Emerald Cyber -->
-                  <button type="button" data-preset="theme-dk-emerald" class="theme-preset-card group p-3 text-left rounded-xl border border-white/10 hover:border-emerald-500/55 bg-slate-950/60 transition-all cursor-pointer">
+                  <!-- Theme 5 -->
+                  <button type="button" data-preset="theme-pulsar-emerald" class="theme-preset-card group p-3 text-left rounded-xl border border-white/10 hover:border-emerald-500/55 bg-slate-950/60 transition-all cursor-pointer">
                     <div class="flex items-center justify-between mb-2">
-                      <span class="text-xs font-bold text-slate-100">Emerald Cyber</span>
+                      <span class="text-xs font-bold text-slate-100">Pulsar Emerald</span>
                       <span class="text-[7px] uppercase px-1 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-mono font-bold tracking-widest">Dark</span>
                     </div>
                     <div class="flex gap-1.5">
-                      <span class="w-4 h-4 rounded-full bg-stone-950 border border-white/20 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-slate-950 border border-white/20 inline-block"></span>
                       <span class="w-4 h-4 rounded-full bg-emerald-500 inline-block"></span>
-                      <span class="w-4 h-4 rounded-full bg-cyan-400 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-teal-400 inline-block"></span>
                     </div>
                   </button>
 
-                  <!-- Theme 3: Light Sakura Dawn -->
-                  <button type="button" data-preset="theme-lt-sakura" class="theme-preset-card group p-3 text-left rounded-xl border border-slate-200 hover:border-rose-500/55 bg-rose-50/40 transition-all cursor-pointer">
+                  <!-- Theme 6 -->
+                  <button type="button" data-preset="theme-supernova-crimson" class="theme-preset-card group p-3 text-left rounded-xl border border-white/10 hover:border-rose-500/55 bg-slate-950/60 transition-all cursor-pointer">
                     <div class="flex items-center justify-between mb-2">
-                      <span class="text-xs font-bold text-slate-800">Sakura Dawn</span>
-                      <span class="text-[7px] uppercase px-1 py-0.5 rounded bg-rose-500/10 text-rose-500 font-mono font-bold tracking-widest">Light</span>
-                    </div>
-                    <div class="flex gap-1.5">
-                      <span class="w-4 h-4 rounded-full bg-rose-50 border border-stone-300 inline-block"></span>
-                      <span class="w-4 h-4 rounded-full bg-rose-500 inline-block"></span>
-                      <span class="w-4 h-4 rounded-full bg-orange-400 inline-block"></span>
-                    </div>
-                  </button>
-
-                  <!-- Theme 4: Light Nordic Mint -->
-                  <button type="button" data-preset="theme-lt-nordic" class="theme-preset-card group p-3 text-left rounded-xl border border-slate-200 hover:border-sky-500/55 bg-sky-50/40 transition-all cursor-pointer">
-                    <div class="flex items-center justify-between mb-2">
-                      <span class="text-xs font-bold text-slate-800">Nordic Mint</span>
-                      <span class="text-[7px] uppercase px-1 py-0.5 rounded bg-sky-500/10 text-sky-400 font-mono font-bold tracking-widest">Light</span>
-                    </div>
-                    <div class="flex gap-1.5">
-                      <span class="w-4 h-4 rounded-full bg-sky-50 border border-stone-300 inline-block"></span>
-                      <span class="w-4 h-4 rounded-full bg-sky-500 inline-block"></span>
-                      <span class="w-4 h-4 rounded-full bg-teal-500 inline-block"></span>
-                    </div>
-                  </button>
-
-                  <!-- Theme 5: Dark Rose Crimson -->
-                  <button type="button" data-preset="theme-dk-rosered" class="theme-preset-card group p-3 text-left rounded-xl border border-white/10 hover:border-rose-500/55 bg-slate-950/60 transition-all cursor-pointer">
-                    <div class="flex items-center justify-between mb-2">
-                      <span class="text-xs font-bold text-slate-100">Rose Crimson</span>
+                      <span class="text-xs font-bold text-slate-100">Supernova Crimson</span>
                       <span class="text-[7px] uppercase px-1 py-0.5 rounded bg-rose-500/10 text-rose-400 font-mono font-bold tracking-widest">Dark</span>
                     </div>
                     <div class="flex gap-1.5">
                       <span class="w-4 h-4 rounded-full bg-rose-950 border border-white/20 inline-block"></span>
                       <span class="w-4 h-4 rounded-full bg-rose-500 inline-block"></span>
-                      <span class="w-4 h-4 rounded-full bg-amber-600 inline-block"></span>
-                    </div>
-                  </button>
-
-                  <!-- Theme 6: Light Rose Velvet -->
-                  <button type="button" data-preset="theme-lt-rosered" class="theme-preset-card group p-3 text-left rounded-xl border border-slate-200 hover:border-rose-500/55 bg-rose-50/40 transition-all cursor-pointer">
-                    <div class="flex items-center justify-between mb-2">
-                      <span class="text-xs font-bold text-slate-800">Rose Velvet</span>
-                      <span class="text-[7px] uppercase px-1 py-0.5 rounded bg-rose-500/10 text-rose-500 font-mono font-bold tracking-widest">Light</span>
-                    </div>
-                    <div class="flex gap-1.5">
-                      <span class="w-4 h-4 rounded-full bg-rose-100 border border-stone-300 inline-block"></span>
-                      <span class="w-4 h-4 rounded-full bg-rose-500 inline-block"></span>
-                      <span class="w-4 h-4 rounded-full bg-pink-400 inline-block"></span>
+                      <span class="w-4 h-4 rounded-full bg-purple-400 inline-block"></span>
                     </div>
                   </button>
                 </div>

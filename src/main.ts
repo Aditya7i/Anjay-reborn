@@ -587,7 +587,7 @@ function initializeStorageAndCache() {
   if (lblChimeVol) lblChimeVol.textContent = `${chimeVol}%`;
 
   // Theme Presets and custom settings load
-  const savedPreset = localStorage.getItem('ambient_theme_preset') || 'theme-dk-classic';
+  const savedPreset = localStorage.getItem('ambient_theme_preset') || 'theme-centauri-void';
   const sliderG = document.getElementById('slider-glow-intensity') as HTMLInputElement;
   const glowInt = localStorage.getItem('neon_glow_intensity') || '45';
   if (sliderG) sliderG.value = glowInt;
@@ -660,6 +660,153 @@ function applyInteractiveCSSVariables(primary: string, secondary: string, intens
   if (labelInt) labelInt.textContent = `${intensity}%`;
 }
 
+// Define themes configuration object
+const THEMES: Record<string, {
+    nama: string;
+    jenis: 'light' | 'dark';
+    deskripsi: string;
+    variabel: Record<string, string>;
+}> = {
+    'theme-stratosphere-iii': {
+        nama: 'Stratosphere III',
+        jenis: 'light',
+        deskripsi: 'Gradasi lembut 7 lapisan dari biru langit pucat hingga azure yang menenangkan',
+        variabel: {
+            '--primary-gradient': 'linear-gradient(135deg, #FFFFFF, #F5FAFF, #F0F8FF, #E1F5FE, #B3E5FC, #81D4FA, #64B5F6, #42A5F5)',
+            '--primary-lighter': '#f0f9ff',
+            '--glass-bg': 'rgba(255, 255, 255, 0.7)',
+            '--glass-border': 'rgba(6, 182, 212, 0.6)',
+            '--text-dark': '#1e3a8a',
+            '--text-light': '#475569',
+            '--bg-sheet': '#ffffff',
+            '--text-diary': '#1e293b',
+            '--shadow': '0 8px 32px 0 rgba(30, 58, 138, 0.12)',
+            '--accent-color': '#0288d1',
+            '--accent-secondary': '#26c6da',
+            '--success-color': '#66bb6a',
+            '--error-color': '#ef5350',
+            '--clk-clock': '#0288d1',
+            '--clk-min': '#26c6da',
+            '--clk-sec': '#ef5350',
+        }
+    },
+    'theme-aurora-borealis-light': {
+        nama: 'Aurora Borealis Light',
+        jenis: 'light',
+        deskripsi: 'Pendaran fajar kutub utara dengan sentuhan mint transparan dan hijau sage lembut',
+        variabel: {
+            '--primary-gradient': 'linear-gradient(135deg, #FFFFFF, #F4FBF7, #E8F8F0, #D1F2E1, #A3E6C2, #75D9A5, #48CC88, #22C55E)',
+            '--primary-lighter': '#f4fbf7',
+            '--glass-bg': 'rgba(255, 255, 255, 0.7)',
+            '--glass-border': 'rgba(6, 182, 212, 0.6)',
+            '--text-dark': '#064e3b',
+            '--text-light': '#334155',
+            '--bg-sheet': '#ffffff',
+            '--text-diary': '#0f172a',
+            '--shadow': '0 8px 32px 0 rgba(6, 78, 59, 0.1)',
+            '--accent-color': '#10b981',
+            '--accent-secondary': '#14b8a6',
+            '--success-color': '#22c55e',
+            '--error-color': '#f43f5e',
+            '--clk-clock': '#10b981',
+            '--clk-min': '#14b8a6',
+            '--clk-sec': '#f43f5e',
+        }
+    },
+    'theme-andromeda-nebula': {
+        nama: 'Andromeda Nebula',
+        jenis: 'light',
+        deskripsi: 'Sentuhan kosmik estetik perpaduan kabut merah muda sakura dan ungu lavender sutra',
+        variabel: {
+            '--primary-gradient': 'linear-gradient(135deg, #FFFFFF, #FFF5F7, #FFE4E6, #FCE7F3, #F9A8D4, #F472B6, #EC4899, #D946EF)',
+            '--primary-lighter': '#fff5f7',
+            '--glass-bg': 'rgba(255, 255, 255, 0.7)',
+            '--glass-border': 'rgba(6, 182, 212, 0.6)',
+            '--text-dark': '#4c0519',
+            '--text-light': '#475569',
+            '--bg-sheet': '#ffffff',
+            '--text-diary': '#1e293b',
+            '--shadow': '0 8px 32px 0 rgba(76, 5, 25, 0.1)',
+            '--accent-color': '#db2777',
+            '--accent-secondary': '#8b5cf6',
+            '--success-color': '#10b981',
+            '--error-color': '#f43f5e',
+            '--clk-clock': '#db2777',
+            '--clk-min': '#8b5cf6',
+            '--clk-sec': '#f43f5e',
+        }
+    },
+    'theme-centauri-void': {
+        nama: 'Centauri Void',
+        jenis: 'dark',
+        deskripsi: 'Kedalaman ruang hampa cypher hitam-biru dengan outlines neon cyan tajam',
+        variabel: {
+            '--primary-gradient': 'linear-gradient(135deg, #020617, #070f22, #0b152e, #0f1c3f, #13234f, #172a60)',
+            '--primary-lighter': '#0b152e',
+            '--glass-bg': 'linear-gradient(135deg, rgba(7, 15, 34, 0.5), rgba(15, 28, 63, 0.4))',
+            '--glass-border': 'rgba(0, 255, 255, 0.35)',
+            '--text-dark': '#ffffff',
+            '--text-light': '#94a3b8',
+            '--bg-sheet': '#020617',
+            '--text-diary': '#f8fafc',
+            '--shadow': '0 8px 32px 0 rgba(0, 255, 255, 0.15)',
+            '--accent-color': '#00ffff',
+            '--accent-secondary': '#38bdf8',
+            '--success-color': '#4ade80',
+            '--error-color': '#f43f5e',
+            '--clk-clock': '#00ffff',
+            '--clk-min': '#38bdf8',
+            '--clk-sec': '#f43f5e',
+        }
+    },
+    'theme-pulsar-emerald': {
+        nama: 'Pulsar Emerald',
+        jenis: 'dark',
+        deskripsi: 'Radiasi bintang mati pulsar berbasis obsidian gelap berpadu pendaran hijau elektrik',
+        variabel: {
+            '--primary-gradient': 'linear-gradient(135deg, #022c22, #022c22, #061512, #0b2520, #020806)',
+            '--primary-lighter': '#061512',
+            '--glass-bg': 'linear-gradient(135deg, rgba(6, 21, 18, 0.55), rgba(11, 37, 32, 0.45))',
+            '--glass-border': 'rgba(0, 255, 255, 0.35)',
+            '--text-dark': '#edfbf7',
+            '--text-light': '#a7f3d0',
+            '--bg-sheet': '#022c22',
+            '--text-diary': '#f0fdf4',
+            '--shadow': '0 8px 32px 0 rgba(16, 185, 129, 0.15)',
+            '--accent-color': '#10b981',
+            '--accent-secondary': '#2dd4bf',
+            '--success-color': '#34d399',
+            '--error-color': '#fb7185',
+            '--clk-clock': '#10b981',
+            '--clk-min': '#2dd4bf',
+            '--clk-sec': '#fb7185',
+        }
+    },
+    'theme-supernova-crimson': {
+        nama: 'Supernova Crimson',
+        jenis: 'dark',
+        deskripsi: 'Ledakan bintang raksasa merah berbasis cyberpunk burgundy pekat berselimut api neon',
+        variabel: {
+            '--primary-gradient': 'linear-gradient(135deg, #450a0a, #450a0a, #0c0204, #1a0509, #050001)',
+            '--primary-lighter': '#1a0509',
+            '--glass-bg': 'linear-gradient(135deg, rgba(26, 5, 9, 0.6), rgba(69, 10, 10, 0.35))',
+            '--glass-border': 'rgba(0, 255, 255, 0.35)',
+            '--text-dark': '#fff1f2',
+            '--text-light': '#fecdd3',
+            '--bg-sheet': '#450a0a',
+            '--text-diary': '#fff1f2',
+            '--shadow': '0 8px 32px 0 rgba(244, 63, 94, 0.18)',
+            '--accent-color': '#f43f5e',
+            '--accent-secondary': '#c084fc',
+            '--success-color': '#10b981',
+            '--error-color': '#ef4444',
+            '--clk-clock': '#f43f5e',
+            '--clk-min': '#c084fc',
+            '--clk-sec': '#ef4444',
+        }
+    }
+};
+
 function applyThemePreset(themeId: string, initLoad: boolean = false) {
   const body = document.body;
   // Remove any pre-existing theme- classes on body dynamically
@@ -669,29 +816,18 @@ function applyThemePreset(themeId: string, initLoad: boolean = false) {
     }
   });
   body.classList.add(themeId);
-  
-  let primary = '#3b82f6';
-  let secondary = '#10b981';
-  
-  if (themeId === 'theme-dk-classic') {
-    primary = '#3b82f6';
-    secondary = '#8b5cf6';
-  } else if (themeId === 'theme-dk-emerald') {
-    primary = '#10b981';
-    secondary = '#06b6d4';
-  } else if (themeId === 'theme-dk-rosered') {
-    primary = '#f43f5e';
-    secondary = '#fb7185';
-  } else if (themeId === 'theme-lt-sakura') {
-    primary = '#f43f5e';
-    secondary = '#fb923c';
-  } else if (themeId === 'theme-lt-nordic') {
-    primary = '#0ea5e9';
-    secondary = '#14b8a6';
-  } else if (themeId === 'theme-lt-rosered') {
-    primary = '#e11d48';
-    secondary = '#f43f5e';
+
+  // Apply variables if theme exists
+  const theme = THEMES[themeId];
+  if (theme) {
+    const root = document.documentElement;
+    for (const [key, value] of Object.entries(theme.variabel)) {
+      root.style.setProperty(key, value);
+    }
   }
+  
+  let primary = theme ? theme.variabel['--accent-color'] : '#3b82f6';
+  let secondary = theme ? theme.variabel['--accent-secondary'] : '#10b981';
 
   if (initLoad) {
     primary = localStorage.getItem('neon_primary') || primary;
@@ -2151,7 +2287,7 @@ function renderTrackLyrics(track: EmbeddedTrack) {
   
   if (parsed.length === 0) {
     scroller.innerHTML = `
-      <div class="text-slate-500 text-xs font-mono py-16 text-center">
+      <div class="text-slate-500 text-xs font-mono py-16 text-left ml-8 sm:ml-12">
         Tidak ada lirik terpasang pada trek ini.
       </div>
     `;
@@ -2160,7 +2296,7 @@ function renderTrackLyrics(track: EmbeddedTrack) {
   
   scroller.innerHTML = parsed.map((item, idx) => {
     return `
-      <p id="lyric-line-${idx}" class="lyric-line text-[15px] sm:text-xl font-medium text-slate-400 transition-all duration-300 select-none py-2 transform hover:scale-102 cursor-pointer" onclick="window.seekToLyricTime(${item.time})">
+      <p id="lyric-line-${idx}" class="lyric-line ml-12 sm:ml-16 text-[15px] sm:text-xl font-medium text-slate-400 transition-all duration-300 select-none py-2 transform hover:translate-x-2 cursor-pointer" onclick="window.seekToLyricTime(${item.time})">
         ${item.text}
       </p>
     `;
@@ -2240,7 +2376,7 @@ function renderActivePlayerVisuals() {
     const scroller = document.getElementById('lyrics-display-scroller');
     if (scroller) {
       scroller.innerHTML = `
-        <div class="text-slate-500 text-xs font-mono py-16 text-center">
+        <div class="text-slate-500 text-xs font-mono py-16 text-left ml-8 sm:ml-12">
           Lirik lagu akan tampil otomatis saat trek audio dimainkan.
         </div>
       `;
@@ -2540,9 +2676,9 @@ function highlightLyricsAt(currentTime: number) {
     const el = document.getElementById(`lyric-line-${idx}`);
     if (el) {
       if (idx === activeIdx) {
-        el.className = 'lyric-line text-lg sm:text-2xl font-black text-emerald-400 py-2.5 transition-all duration-150 cursor-pointer scale-105 select-none text-glow-secondary';
+        el.className = 'lyric-line ml-12 sm:ml-16 text-lg sm:text-2xl font-black text-emerald-400 py-2.5 transition-all duration-150 cursor-pointer scale-105 select-none text-glow-secondary';
       } else {
-        el.className = 'lyric-line text-[15px] sm:text-xl font-medium text-slate-400 py-2 transition-all duration-150 cursor-pointer opacity-60 hover:opacity-100 hover:text-white select-none';
+        el.className = 'lyric-line ml-12 sm:ml-16 text-[15px] sm:text-xl font-medium text-slate-400 py-2 transition-all duration-150 cursor-pointer opacity-60 hover:opacity-100 hover:text-white select-none hover:translate-x-2 transform';
       }
     }
   });
@@ -3122,3 +3258,23 @@ function updateDashboardTodoStats() {
     ratioEl.innerHTML = `${completed}<span class="text-slate-500 font-medium">/${total}</span>`;
   }
 }
+
+// Simple Theme Toggle (Pure JS with Pure CSS classes)
+let isSimpleDark = true;
+(window as any).toggleSimpleTheme = function() {
+  isSimpleDark = !isSimpleDark;
+  
+  if (!isSimpleDark) {
+    document.body.classList.add('simple-light-mode');
+  } else {
+    document.body.classList.remove('simple-light-mode');
+  }
+
+  // Toggle Moon/Sun icon on button
+  const btnIcon = document.querySelector('#btn-toggle-simple-theme i');
+  if (btnIcon) {
+    btnIcon.className = isSimpleDark ? 'fa-solid fa-moon' : 'fa-solid fa-sun text-slate-800';
+  }
+  
+  (window as any).spawnToast?.('info', 'Theme Toggled', isSimpleDark ? 'Dark Mode Aktif' : 'Light Mode Aktif');
+};
