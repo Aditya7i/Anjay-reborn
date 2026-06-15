@@ -14,7 +14,7 @@
 @layer base {
   body {
     @apply font-sans transition-colors duration-500 overflow-x-hidden;
-    background: var(--primary-gradient, radial-gradient(circle at 100% 100%, #172554 0%, #020617 60%, #030712 100%));
+    background: radial-gradient(circle at 100% 100%, #311059 0%, #020205 70%);
     min-height: 100vh;
     color: var(--text-dark, #f1f5f9);
   }

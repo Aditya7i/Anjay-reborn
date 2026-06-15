@@ -667,6 +667,9 @@
               <p id="user-profile-sub" class="text-[8px] font-mono text-emerald-400 capitalize tracking-wider font-semibold">● Tamu</p>
             </div>
           </div>
+          <button id="btn-user-logout" class="w-8 h-8 rounded-full bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 hover:text-rose-300 flex items-center justify-center transition-all hidden" title="Keluar / Logout">
+             <i class="fa-solid fa-right-from-bracket text-xs"></i>
+          </button>
 
           <!-- Quick Controls: Speaker popover and System Time -->
           <div class="flex items-center gap-2">
@@ -712,7 +715,11 @@
       </div>
 
       <!-- BOTTOM NAVIGATION BAR (FLOATING DOCK) -->
-      <footer class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-1.5rem)] sm:w-[calc(100%-3rem)] max-w-5xl bg-slate-950/90 border border-white/10 backdrop-blur-xl z-50 shadow-[0_10px_35px_rgba(59,130,246,0.22)] rounded-2xl">
+      <footer class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[calc(100%-1.5rem)] sm:w-[calc(100%-3rem)] max-w-5xl 
+               bg-slate-950/70 border border-cyan-400 
+               backdrop-blur-2xl z-50 
+               shadow-[0_0_15px_rgba(6,182,212,0.5),0_0_30px_rgba(6,182,212,0.3),inset_0_0_20px_rgba(6,182,212,0.4)] 
+               rounded-2xl ring-1 ring-cyan-500/50">
         <div class="px-3 sm:px-4 py-2 flex items-center justify-between gap-2.5">
           <!-- Sidebar Tabs Navigation Grid, formatted as a responsive flat row -->
           <nav class="flex items-center justify-between gap-1 sm:gap-2 flex-grow" id="sidebar-nav">
@@ -750,6 +757,11 @@
               <i class="fa-solid fa-sliders text-sm sm:text-xs"></i> 
               <span class="hidden md:inline">Setelan</span>
               <span class="md:hidden text-[9px]">Setelan</span>
+            </button>
+            <button data-tab="tab-panel-keuangan" class="nav-item flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-center text-[10px] sm:text-xs font-bold tracking-wider transition-all text-slate-400 hover:text-white hover:bg-white/5 cursor-pointer flex-1">
+              <i class="fa-solid fa-wallet text-sm sm:text-xs"></i> 
+              <span class="hidden md:inline">Keuangan</span>
+              <span class="md:hidden text-[9px]">Keuangan</span>
             </button>
           </nav>
         </div>
@@ -936,15 +948,21 @@
         <!-- VIEW TABS 1.5: TUGAS (TODO LIST) PANEL -->
         <!-- ------------------------------------------------ -->
         <section id="panel-tugas" class="view-panel hidden space-y-6">
+
           <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div>
-              <h1 class="text-3xl font-extrabold uppercase tracking-tight text-white font-display text-glow">Tugas & Agenda 📋</h1>
+              <h1 class="text-3xl font-extrabold uppercase tracking-tight text-white font-display text-glow flex items-center gap-2">Tugas & Agenda 📋</h1>
               <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider font-mono">Daftar tugas personal dengan filter prioritas</p>
             </div>
             
-            <div class="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/10 text-xs font-mono">
-              <span class="text-indigo-400 pl-2">STATUS TASK:</span>
-              <span id="tugas-counter-badge" class="text-teal-400 font-black pr-2">0 Selesai</span>
+            <div class="flex items-center gap-2">
+              <button id="btn-request-notification" class="flex items-center gap-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 p-2 rounded-xl border border-indigo-500/20 text-xs font-mono transition-all cursor-pointer">
+                <i class="fa-solid fa-bell"></i> Izin Notifikasi
+              </button>
+              <div class="flex items-center gap-2 bg-white/5 p-2 rounded-xl border border-white/10 text-xs font-mono">
+                <span class="text-indigo-400">STATUS TASK:</span>
+                <span id="tugas-counter-badge" class="text-teal-400 font-black">0 Selesai</span>
+              </div>
             </div>
           </div>
 
@@ -1028,10 +1046,7 @@
             <!-- Calendar Grid (Spans 2 Column in desktop, full width on mobile) -->
             <div id="calendar-main-column" class="lg:col-span-2 space-y-6">
               <div class="flex items-center justify-between">
-                <div>
-                  <h1 class="text-3xl font-extrabold uppercase tracking-tight text-white font-display text-glow flex items-center gap-2">Kalender 🏮</h1>
-                  <p id="calendar-view-subtitle" class="text-xs text-slate-400 mt-1 uppercase tracking-wider font-mono">WASM Grid Loop Algorithm</p>
-                </div>
+
                 <!-- Month selector togglers -->
                 <div class="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/5">
                   <button id="btn-month-prev" class="p-2 hover:bg-white/10 rounded-lg text-slate-300 text-xs cursor-pointer"><i class="fa-solid fa-chevron-left"></i></button>
@@ -1101,21 +1116,9 @@
         <!-- VIEW TABS 3: AESTHETIC DIARY -->
         <!-- ------------------------------------------------ -->
         <section id="panel-diary" class="view-panel hidden space-y-6">
-          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div>
-              <h1 class="text-3xl font-extrabold uppercase tracking-tight text-white font-display text-glow">Aesthetic Journal Editor</h1>
-              <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider font-mono">Book-styled paper mockup journaling platform</p>
-            </div>
-            
+       
+  
             <!-- Diary Toolbar controllers -->
-            <div class="flex flex-wrap items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/5 text-xs">
-              <span class="px-2 text-[10px] font-mono text-slate-400 uppercase font-bold">SET PANEL PAPER:</span>
-              <button class="btn-paper-style px-2.5 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-white text-[10px] uppercase font-bold cursor-pointer" data-paper="paper-ruled">Line</button>
-              <button class="btn-paper-style px-2.5 py-1.5 rounded-lg bg-white/10 text-slate-300 text-[10px] uppercase font-bold cursor-pointer" data-paper="paper-grid">Square</button>
-              <button class="btn-paper-style px-2.5 py-1.5 rounded-lg bg-white/10 text-slate-300 text-[10px] uppercase font-bold cursor-pointer" data-paper="paper-stardust">Stardust</button>
-              <button class="btn-paper-style px-2.5 py-1.5 rounded-lg bg-white/10 text-slate-300 text-[10px] uppercase font-bold cursor-pointer" data-paper="paper-plain-dark">Plain Dark</button>
-            </div>
-          </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
@@ -1123,6 +1126,12 @@
             <div class="lg:col-span-8 space-y-4">
               <!-- Grid Toolbar styles: font sizing and selection -->
               <div class="p-3 bg-slate-900/60 rounded-xl border border-white/10 flex items-center justify-between text-xs">
+                <div class="flex flex-wrap mr-2 items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/5 text-xs justify-between">
+                  <button class="btn-paper-style px-2.5 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-white text-[10px] uppercase font-bold cursor-pointer" data-paper="paper-ruled">Line</button>
+                  <button class="btn-paper-style px-2.5 py-1.5 rounded-lg bg-white/10 text-slate-300 text-[10px] uppercase font-bold cursor-pointer" data-paper="paper-grid">Square</button>
+                  <button class="btn-paper-style px-2.5 py-1.5 rounded-lg bg-white/10 text-slate-300 text-[10px] uppercase font-bold cursor-pointer" data-paper="paper-stardust">Stardust</button>
+                  <button class="btn-paper-style px-2.5 py-1.5 rounded-lg bg-white/10 text-slate-300 text-[10px] uppercase font-bold cursor-pointer" data-paper="paper-plain-dark">Plain Dark</button>
+                </div>
                 <div class="flex items-center gap-4">
                   <!-- Font families dropdown select -->
                   <div class="flex items-center gap-1.5">
@@ -1191,10 +1200,7 @@
         <!-- ------------------------------------------------ -->
         <section id="panel-games" class="view-panel hidden space-y-6">
           <div class="flex items-center justify-between border-b border-white/5 pb-2">
-            <div>
-              <h1 class="text-3xl font-extrabold uppercase tracking-tight text-white font-display text-glow">Mini Games Engine 🎯</h1>
-              <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider font-mono">Lightweight sandbox gaming computed in real Go RAM logic</p>
-            </div>
+ 
             <!-- Sub-tabs switches inside Games Panel -->
             <div class="flex items-center gap-1.5 bg-white/5 p-1 rounded-xl border border-white/5 text-xs">
               <button class="btn-game-selector px-2.5 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 text-[10px] uppercase font-bold cursor-pointer" data-game="tictactoe">TicTacToe</button>
@@ -1276,152 +1282,128 @@
         <!-- ------------------------------------------------ -->
         <section id="panel-player" class="view-panel hidden space-y-6">
 
-          <div class="w-full">
-            <!-- Integrated Player Core: Track Header + Lyrics Main Area + Controllers Footer -->
-            <!-- h-[650px] is fixed to keep the entire experience sleek and non-scrollable as requested -->
-            <div class="large-card glow-card-primary flex flex-col h-[650px] p-4 sm:p-5 relative overflow-hidden">
-                
-              <!-- 1. HEADER: Track image, judul lagu, and artist -->
-              <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/5 pb-3.5 shrink-0 text-center sm:text-left">
-                <div class="flex flex-col sm:flex-row items-center gap-4 min-w-0 flex-1">
-                  <!-- Track cover image -->
-                  <div id="music-disc-artwork" class="w-16 h-16 rounded-full bg-gradient-to-br from-rose-500 via-purple-600 to-indigo-600 flex items-center justify-center relative shadow-lg overflow-hidden transition-all duration-300 shrink-0 border border-white/10">
-                    <div class="absolute inset-1.5 rounded-full border border-white/10"></div>
-                    <!-- Vinyl center representation -->
-                    <div class="w-3.5 h-3.5 rounded-full bg-slate-950 flex items-center justify-center border-2 border-slate-900 z-10"></div>
-                  </div>
+          <div class="w-full relative rounded-3xl overflow-hidden shadow-2xl">
+            <!-- Blurred Background Layer -->
+            <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+              <div id="music-blurred-bg" class="absolute inset-[-10%] bg-[url('/src/def-img-music/【アニメ MV】NEON MEMORY - 淡いネオンの光の中を駆け抜ける幻想EDM -｜ネオノスタルジカ _ Neo Nostalgica.jpg')] bg-cover bg-center blur-3xl opacity-60"></div>
+              <div class="absolute inset-0 bg-slate-950/60"></div>
+            </div>
 
-                  <!-- Text metadata details & playback state -->
-                  <div class="min-w-0 flex-1">
-                    <h2 id="music-track-title" class="text-2xl sm:text-3xl font-extrabold text-white truncate max-w-full uppercase font-display tracking-tight text-glow-secondary">Tidak Ada Lagu Terpilih</h2>
-                    <p id="music-track-artist" class="text-xs text-slate-400 font-mono mt-0.5">Silakan pilih lagu dari daftar putar</p>
+            <!-- h-[650px] is fixed to keep the entire experience sleek and non-scrollable. 20px margin, no background, no border, with absolute blurred background image -->
+            <div class="m-[20px] bg-transparent border-none h-[650px] relative flex flex-col z-10 rounded-2xl ring-1 ring-white/5 bg-slate-950/20 backdrop-blur-md">
+              
+              <!-- Badges on top right of the card -->
+              <div class="absolute top-4 right-6 z-50 flex items-center justify-end gap-2 shrink-0">
+                <span id="music-source-badge" class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">Audio Synth</span>
+                <span id="music-lyrics-status-badge" class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border border-purple-500/30 bg-purple-500/10 text-purple-400">Lirik Ada</span>
+              </div>
+
+              <!-- TOP AREA: Height 70% (Left 60%, Right 40%) -->
+              <div class="flex flex-col lg:flex-row h-[70%] w-full">
+                <!-- LEFT AREA: Now Playing (60%) -->
+                <div class="w-full lg:w-[60%] flex flex-col justify-center items-center p-4 sm:p-6 relative z-10">
+                  <div class="flex flex-col items-center justify-center w-full relative">
+                    
+                    <!-- Interactive 3D Carousel of Cover Artworks -->
+                    <div class="w-full flex items-center justify-center relative h-[210px] sm:h-[240px] lg:h-[260px] my-1 shrink-0 overflow-visible">
+                      
+                      <!-- Left Navigation Button -->
+                      <button id="btn-carousel-prev" class="absolute left-2 sm:left-4 lg:left-6 z-40 w-9 h-9 bg-slate-950/70 hover:bg-slate-950/90 text-white border border-white/10 backdrop-blur-md rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shadow-lg hover:scale-110 active:scale-95" title="Sebelumnya">
+                        <i class="fa-solid fa-chevron-left text-xs text-emerald-400"></i>
+                      </button>
+
+                      <!-- The 3D Perspective Stage -->
+                      <div id="music-3d-stage" class="relative w-[220px] sm:w-[260px] lg:w-[280px] h-full flex items-center justify-center overflow-visible" style="perspective: 1200px; transform-style: preserve-3d;">
+                        <!-- Track Cover Cards will be generated dynamically here -->
+                        <div class="text-slate-500 text-xs italic text-center py-8">Memuat pemutar 3D...</div>
+                      </div>
+
+                      <!-- Right Navigation Button -->
+                      <button id="btn-carousel-next" class="absolute right-2 sm:right-4 lg:right-6 z-40 w-9 h-9 bg-slate-950/70 hover:bg-slate-950/90 text-white border border-white/10 backdrop-blur-md rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shadow-lg hover:scale-110 active:scale-95" title="Berikutnya">
+                        <i class="fa-solid fa-chevron-right text-xs text-emerald-400"></i>
+                      </button>
+
+                    </div>
+
+                    <!-- Title & Artist (Directly below carousel) -->
+                    <div class="text-center w-full overflow-hidden flex flex-col justify-center mt-4 z-20 shrink-0">
+                      <h2 id="music-track-title" class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white truncate max-w-[90%] mx-auto uppercase font-display tracking-tight text-glow-secondary leading-snug">Tidak Ada Lagu</h2>
+                      <p id="music-track-artist" class="text-xs sm:text-sm text-slate-400 font-mono mt-1 px-4 truncate max-w-[90%] mx-auto">Silakan pilih lagu dari menu antrean</p>
+                    </div>
+
                   </div>
                 </div>
 
-                <!-- Live badges on the far right corner -->
-                <div class="flex items-center gap-2 shrink-0 sm:self-center">
-                  <span id="music-source-badge" class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">Audio Synth</span>
-                  <span id="music-lyrics-status-badge" class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border border-purple-500/30 bg-purple-500/10 text-purple-400">Lirik Ada</span>
+                <!-- RIGHT AREA: Lyrics / Queue List Display (40%) -->
+                <div id="player-right-pane" class="w-full lg:w-[40%] flex flex-col relative overflow-hidden bg-transparent">
+                  <!-- Lyrics View Container -->
+                  <div id="lyrics-display-scroller" class="flex-grow w-full overflow-y-auto space-y-4 pr-1 text-left scroll-smooth pb-20 pt-16" style="mask-image: linear-gradient(to bottom, transparent 0%, white 10%, white 90%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, white 10%, white 90%, transparent 100%);">
+                    <div class="text-slate-500/50 text-sm py-16 text-center italic font-mono transition-all opacity-0"></div> <!-- Empty state text removed -->
+                  </div>
+
+                  <!-- Replace the old modal fixed box with this absolutely positioned overlay within the right pane -->
+                  <div id="modal-playlist-queue" 
+                      class="absolute inset-0 bg-slate-950/40 backdrop-blur-xl z-30 transition-all duration-300 opacity-0 pointer-events-none flex flex-col p-6 sm:p-8 rounded-2xl shadow-2xl">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-4 shrink-0 mb-4">
+                     <!-- <h3 class="text-lg font-display font-bold uppercase text-slate-200 flex items-center gap-2">Antrean Lagu</h3>-->
+                      <div class="flex space-x-2">
+                         <span id="music-queue-counter" class="text-[10px] font-mono text-slate-400 uppercase font-black bg-white/5 py-1 px-3 rounded-lg flex items-center">0 Lagu</span>
+                         <button id="btn-close-queue" class="text-slate-400 hover:text-white w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/5 hover:bg-white/10 cursor-pointer" title="Tutup">
+                           <i class="fa-solid fa-xmark"></i>
+                         </button>
+                      </div>
+                    </div>
+
+                    <!-- Queue List body -->
+                    <div class="flex-grow overflow-y-auto pr-2 space-y-2 mb-4" id="music-playlist-queue">
+                       <div class="text-center italic text-slate-500 text-xs py-10">Memuat daftar putar...</div>
+                    </div>
+                    
+                    <div class="hidden" id="music-inline-playlist-queue"></div> <!-- Dummy element so JS doesn't break -->
+                    <span id="music-inline-queue-counter" class="hidden"></span>
+
+                    <button id="btn-open-add-track" class="w-full shrink-0 py-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 border border-emerald-500/20 uppercase font-bold text-[10.5px] tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-[0_0_15px_-4px_rgba(16,185,129,0.15)]">
+                      <i class="fa-solid fa-circle-plus"></i> TAMBAH LAGU BARU
+                    </button>
+                    <button id="btn-inline-open-add" class="hidden"></button>
+                  </div>
                 </div>
               </div>
 
-              <!-- 2. MAIN BENTO GRID: Lyrics (Left, large) & Next Playing (Right, compact) -->
-              <div class="flex-grow grid grid-cols-1 md:grid-cols-12 gap-4 overflow-hidden py-2">
-                <!-- Left: Lyrics display -->
-                <div class="md:col-span-9 flex flex-col relative overflow-hidden h-full">
-                  <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 shrink-0 mb-1 select-none uppercase tracking-wider">
-                    <span class="flex items-center gap-1.5">Lirik</span>
-                  </div>
-                  
-                  <!-- Display interactive lyrics view scrollable -->
-                  <div id="lyrics-display-scroller" class="flex-grow overflow-y-auto space-y-4 pr-1 text-left py-2 scroll-smooth" style="mask-image: linear-gradient(to bottom, transparent 0%, white 15%, white 85%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, white 15%, white 85%, transparent 100%);">
-                    <!-- Lyrics will be generated here -->
-                    <div class="text-slate-500 text-sm sm:text-base py-16 ml-8 sm:ml-12">
-                      Lirik lagu akan tampil otomatis saat musik dimainkan.
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Right: Inline Next Playing Queue inside card -->
-                <div class="md:col-span-3 flex flex-col h-full bg-slate-950/40 rounded-xl p-3 overflow-hidden glow-card-emerald border">
-                  <div class="flex items-center justify-between border-b border-white/5 pb-2 shrink-0">
-                    <h4 class="text-[10px] font-display font-medium uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                      <i class="fa-solid fa-play-pause text-emerald-400"></i> Antrean Lagu
-                    </h4>
-                    <span id="music-inline-queue-counter" class="text-[9px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded">0 Lagu</span>
-                  </div>
-
-                  <!-- Scrollable mini list queue entries -->
-                  <div class="flex-grow space-y-1.5 overflow-y-auto pr-1 mt-2" id="music-inline-playlist-queue">
-                    <div class="text-center italic text-slate-500 text-[10px] py-10">
-                      <p>Memuat antrean...</p>
-                    </div>
-                  </div>
-
-                  <!-- Quick Add button at bottom of next playing list -->
-                  <button id="btn-inline-open-add" class="mt-2 w-full py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 border border-emerald-500/20 uppercase font-bold text-[9px] tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
-                    <i class="fa-solid fa-plus-circle text-[9px]"></i> Tambah Lagu baru
-                  </button>
-                </div>
-              </div>
-
-              <!-- 3. FOOTER: Playback Controller & Tracker -->
-              <div class="border-t border-white/5 pt-3 shrink-0 space-y-2.5">
-                <div class="flex items-center justify-between text-[11px] font-mono text-slate-400 select-none">
-                  <span id="music-time-current" class="bg-slate-950 px-2 py-0.5 rounded border border-white/5 font-bold">00:00</span>
-                  <!-- Playback spectrum graphics -->
-                  <div class="w-1/2 h-1 bg-white/5 rounded-full overflow-hidden relative hidden sm:block">
-                    <div class="absolute inset-0 bg-emerald-500/20 w-full animate-pulse"></div>
-                  </div>
-                  <span id="music-time-duration" class="bg-slate-950 px-2 py-0.5 rounded border border-white/5 font-bold font-mono">00:00</span>
+              <!-- BOTTOM AREA: Controls and Progress bar (100% width, 30% height) -->
+              <div class="h-[30%] w-full flex flex-col justify-center px-6 sm:px-10 pb-4 shrink-0 z-10 space-y-5">
+                <div class="flex items-center justify-between text-xs font-mono text-slate-400 select-none">
+                  <span id="music-time-current" class="bg-slate-950/60 px-3 py-1.5 rounded-md border border-white/5 font-bold">00:00</span>
+                  <span id="music-time-duration" class="bg-slate-950/60 px-3 py-1.5 rounded-md border border-white/5 font-bold">00:00</span>
                 </div>
 
                 <!-- Drag/Scrub Slider -->
-                <input type="range" id="music-tracker-slider" min="0" max="100" value="0" class="w-full h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer outline-none accent-emerald-400" />
+                <input type="range" id="music-tracker-slider" min="0" max="100" value="0" class="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer outline-none accent-emerald-400" />
                 
-                <!-- Physical Buttons & Volume Dock -->
-                <div class="flex items-center justify-between gap-4 pt-0.5">
-                  <!-- Control Buttons Left -->
-                  <div class="flex items-center gap-2">
-                    <button id="btn-music-prev" class="w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-all text-xs cursor-pointer border border-white/5" title="Lagu Sebelumnya"><i class="fa-solid fa-backward-step"></i></button>
-                    <button id="btn-music-play" class="w-11 h-11 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 hover:text-white flex items-center justify-center text-xs cursor-pointer shadow-lg border border-emerald-500/30 transition-all">
+                <div class="flex items-center justify-between pt-4">
+                  <div class="flex items-center gap-3 sm:gap-4">
+                    <button id="btn-music-shuffle" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-white transition-all text-sm cursor-pointer" title="Acak Lagu"><i class="fa-solid fa-shuffle"></i></button>
+                    <button id="btn-music-prev" class="w-12 h-12 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-all text-sm cursor-pointer border border-white/5" title="Lagu Sebelumnya"><i class="fa-solid fa-backward-step"></i></button>
+                    <button id="btn-music-play" class="w-16 h-16 rounded-2xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 hover:text-white flex items-center justify-center text-xl cursor-pointer shadow-lg border border-emerald-500/30 transition-all focus:scale-95">
                       <i class="fa-solid fa-play translate-x-0.5"></i>
                     </button>
-                    <button id="btn-music-next" class="w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-all text-xs cursor-pointer border border-white/5" title="Trek Selanjutnya"><i class="fa-solid fa-forward-step"></i></button>
-                    <button id="btn-toggle-queue" class="w-9 h-9 flex items-center justify-center bg-emerald-500/5 hover:bg-emerald-500/10 rounded-xl text-emerald-500 hover:text-emerald-400 border border-emerald-500/10 transition-all text-xs cursor-pointer" title="Buka Playlist Popup">
+                    <button id="btn-music-next" class="w-12 h-12 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-all text-sm cursor-pointer border border-white/5" title="Trek Selanjutnya"><i class="fa-solid fa-forward-step"></i></button>
+                    <button id="btn-music-repeat" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-white transition-all text-sm cursor-pointer" title="Ulangi Lagu"><i class="fa-solid fa-repeat"></i></button>
+                  </div>
+
+                  <div class="flex items-center gap-4">
+                    <button id="btn-toggle-queue" class="w-12 h-12 flex items-center justify-center bg-emerald-500/10 hover:bg-emerald-500/20 rounded-xl text-emerald-400 border border-emerald-500/20 transition-all text-sm cursor-pointer shadow-[0_0_10px_-2px_rgba(16,185,129,0.2)]" title="Buka Playlist">
                       <i class="fa-solid fa-list-ul"></i>
                     </button>
-                  </div>
-
-                  <!-- Control Buttons Right: Shuffle, Repeat + Volume -->
-                  <div class="flex items-center gap-3.5">
-                    <!-- Shuffle & Repeat -->
-                    <div class="flex items-center gap-1.5 shrink-0">
-                      <button id="btn-music-shuffle" class="w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-all text-xs cursor-pointer border border-white/5" title="Acak Lagu (Shuffle)">
-                        <i class="fa-solid fa-shuffle"></i>
-                      </button>
-                      <button id="btn-music-repeat" class="w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-all text-xs cursor-pointer border border-white/5" title="Ulangi Lagu (Repeat)">
-                        <i class="fa-solid fa-repeat"></i>
-                      </button>
-                    </div>
-
-                    <!-- Volume slider control -->
-                    <div class="flex items-center gap-2 bg-slate-950/60 pl-3 pr-3.5 py-1.5 rounded-xl border border-white/5 shrink-0 select-none">
-                      <i class="fa-solid fa-volume-low text-[10px] text-emerald-400"></i>
-                      <input type="range" id="music-volume-slider" min="0" max="100" value="70" class="w-16 sm:w-24 h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer outline-none accent-emerald-400" />
-                      <i class="fa-solid fa-volume-high text-[10px] text-emerald-400"></i>
+                    
+                    <!-- Volume -->
+                    <div class="hidden sm:flex items-center gap-2 bg-slate-950/60 px-3 py-2 rounded-xl border border-white/5 cursor-pointer group">
+                      <i class="fa-solid fa-volume-low text-xs text-slate-500 group-hover:text-emerald-400 transition-colors"></i>
+                      <input type="range" id="music-volume-slider" min="0" max="100" value="70" class="w-20 h-1.5 bg-slate-950 border border-white/10 rounded-lg appearance-none outline-none accent-emerald-400 transition-all" />
                     </div>
                   </div>
                 </div>
               </div>
-
-            </div>
-          </div>
-
-          <!-- BACKDROP MODAL: PLAYLIST QUEUE LIST -->
-          <div id="modal-playlist-queue" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 transition-all duration-300 opacity-0 pointer-events-none">
-            <div class="large-card max-w-md w-full p-5 flex flex-col space-y-4 max-h-[85vh] relative border border-white/10 shadow-[0_10px_50px_rgba(0,0,0,0.5)]">
-              <!-- Close Button -->
-              <button id="btn-close-queue" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors cursor-pointer text-sm w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/5 hover:bg-white/10" title="Tutup">
-                <i class="fa-solid fa-xmark"></i>
-              </button>
-
-              <div class="border-b border-white/5 pb-2.5 flex items-center justify-between shrink-0 pr-8">
-                <h3 class="text-sm font-display font-bold uppercase text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-list-ul text-emerald-400"></i> Daftar Putar</h3>
-                <span id="music-queue-counter" class="text-[9px] font-mono text-slate-500 uppercase font-black bg-white/5 px-2 py-0.5 rounded">0 Lagu</span>
-              </div>
-
-              <!-- Scrollable list queue entries -->
-              <div class="flex-grow space-y-1.5 overflow-y-auto pr-1" id="music-playlist-queue">
-                <div class="text-center italic text-slate-500 text-xs py-10">
-                  <p>Memuat daftar putar...</p>
-                </div>
-              </div>
-
-              <!-- Open input track -->
-              <button id="btn-open-add-track" class="w-full py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 border border-emerald-500/20 uppercase font-bold text-[10px] tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-[0_0_15px_-4px_rgba(16,185,129,0.15)]">
-                <i class="fa-solid fa-circle-plus"></i> TAMBAH LAGU & LIRIK BARU
-              </button>
             </div>
           </div>
 
@@ -1480,10 +1462,15 @@
                 <!-- Lyrics input system -->
                 <div class="space-y-1">
                   <div class="flex justify-between items-center">
-                    <label class="text-[9px] font-mono tracking-wider font-extrabold text-slate-400 uppercase">Input Lirik Lagu (Gunakan format LRC atau baris biasa)</label>
-                    <span class="text-[8px] font-mono text-blue-400 font-bold">Gunakan template [mm:ss.xx]</span>
+                    <label class="text-[9px] font-mono tracking-wider font-extrabold text-slate-400 uppercase block">File Lirik (.lrc / .lyc)</label>
                   </div>
-                  <textarea id="add-track-lyrics" rows="4" placeholder="Contoh:&#10;[00:02.00] (Pendahuluan Musik)&#10;[00:10.00] Di bawah langit senja melangkah tenang..." class="w-full bg-slate-950 border border-white/10 px-3 py-2 rounded-lg text-xs text-white outline-none focus:border-blue-400/50 font-mono resize-none"></textarea>
+                  <div class="flex items-center gap-2">
+                    <label class="px-3.5 py-2 bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 text-[10px] font-mono font-bold rounded-lg cursor-pointer transition-all flex items-center gap-2 flex-1 justify-center uppercase">
+                      <i class="fa-solid fa-file-lines text-purple-400"></i> <span id="add-track-lyrics-label">TIDAK ADA LIRIK (PILIH FILE)</span>
+                      <input type="file" id="add-track-lyrics-file" accept=".lrc,.lyc,text/*" class="hidden" />
+                    </label>
+                  </div>
+                  <textarea id="add-track-lyrics" rows="1" class="hidden" placeholder="No Lyrics available"></textarea>
                 </div>
 
                 <!-- Gradient Cover Preset -->
@@ -1680,6 +1667,123 @@
           </div>
         </section>
 
+        <!-- ------------------------------------------------ -->
+        <!-- VIEW TABS 7: KEUANGAN (FINANCIAL MODULE)         -->
+        <!-- ------------------------------------------------ -->
+        <section id="panel-keuangan" class="view-panel hidden space-y-6">
+        
+
+          <div class="flex flex-col lg:flex-row items-stretch gap-6">
+            <!-- LEFT COLUMN (40%) -->
+            <div class="lg:w-2/5 flex flex-col space-y-4">
+              <div class="large-card liquid-glass flex flex-col justify-between space-y-4 h-full">
+                <div>
+                  <h2 class="text-sm font-sans font-black uppercase text-slate-200 border-b border-white/10 pb-2 mb-3" id="financial-left-header">
+                    Analisis Keuangan Bulan <span id="financial-current-month" class="text-emerald-400">...</span>
+                  </h2>
+                  <div class="space-y-4">
+                    <div>
+                      <label class="text-[10px] uppercase font-bold text-slate-400 tracking-wider flex justify-between">
+                        <span>Pemasukan Terkumpul</span>
+                        <span id="financial-total-income-label" class="text-emerald-400">$0</span>
+                      </label>
+                      <div class="flex gap-2 mt-1">
+                        <input type="number" id="financial-income-input" class="w-full bg-slate-950/50 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition-all focus:shadow-[0_0_15px_rgba(16,185,129,0.3)]" placeholder="Tambah Pemasukan ($)">
+                        <button id="btn-save-income" class="px-4 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-bold uppercase tracking-wider transition-all hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] cursor-pointer shrink-0">
+                          <i class="fa-solid fa-plus"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="flex gap-2">
+                      <button id="btn-open-expense-modal" class="flex-1 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-bold uppercase tracking-wider transition-all hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] cursor-pointer">
+                        <i class="fa-solid fa-plus mr-1"></i> Pengeluaran
+                      </button>
+                      <button id="btn-financial-next-month" class="flex-1 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-lg text-xs font-bold uppercase tracking-wider transition-all hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] cursor-pointer">
+                        Next Month <i class="fa-solid fa-arrow-right ml-1"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Expences List -->
+                <div class="flex-1 min-h-[150px] overflow-y-auto space-y-2 pr-1" id="financial-expenses-list">
+                  <div class="text-xs text-slate-500 text-center italic py-10">Belum ada pengeluaran bulan ini</div>
+                </div>
+
+                <!-- Summary Reader -->
+                <div class="bg-slate-950/40 rounded-xl p-3 border border-white/5 space-y-2 max-w-full overflow-hidden shrink-0">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-slate-400 uppercase font-bold tracking-wider">Total Pengeluaran</span>
+                    <span class="text-sm font-bold text-rose-400" id="financial-total-expense">$0</span>
+                  </div>
+                  <div class="flex justify-between items-center border-t border-white/5 pt-2">
+                    <span class="text-xs text-slate-400 uppercase font-bold tracking-wider truncate mr-2">Sisa (Tabungan Bulan Ini)</span>
+                    <span class="text-sm font-black text-emerald-400" id="financial-savings">$0</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT COLUMN (60%) -->
+            <div class="lg:w-3/5 flex flex-col space-y-4">
+              <div class="large-card liquid-glass flex flex-col h-full space-y-4">
+                <h2 class="text-sm font-sans font-black uppercase text-slate-200 border-b border-white/10 pb-2">
+                  Analisis Keuangan Setiap 6 Bulan
+                </h2>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4" id="financial-history-grid">
+                  <!-- Generated dynamically via JS matching backend calculations -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- BACKDROP MODAL: ADD EXPENSE FORM -->
+        <div id="modal-add-expense" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 transition-all duration-300 opacity-0 pointer-events-none">
+          <div class="large-card max-w-sm w-full p-5 flex flex-col space-y-4 max-h-[90vh] overflow-y-auto relative border border-white/10 shadow-[0_10px_50px_rgba(0,0,0,0.5)]">
+            <!-- Close Button -->
+            <button id="btn-close-expense-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors cursor-pointer text-sm w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/5 hover:bg-white/10" title="Tutup Modal">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="border-b border-white/5 pb-2.5 flex items-center justify-between shrink-0 pr-8">
+              <h3 class="text-sm font-display font-black uppercase text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-file-invoice text-emerald-400"></i> Tambah Pengeluaran</h3>
+            </div>
+
+            <div class="space-y-4 shrink-0">
+              <div class="space-y-1">
+                <label class="text-[9px] font-mono tracking-wider font-extrabold text-slate-400 uppercase">Nama Pengeluaran</label>
+                <input type="text" id="expense-name" placeholder="Misal: Beli Kopi" class="w-full bg-slate-950 border border-white/10 px-3 py-2 rounded-lg text-xs text-white outline-none focus:border-emerald-400/50" />
+              </div>
+              
+              <div class="space-y-1">
+                <label class="text-[9px] font-mono tracking-wider font-extrabold text-slate-400 uppercase">Nominal ($)</label>
+                <input type="number" id="expense-amount" placeholder="0" class="w-full bg-slate-950 border border-white/10 px-3 py-2 rounded-lg text-xs text-white outline-none focus:border-emerald-400/50" />
+              </div>
+
+              <div class="space-y-1">
+                <label class="text-[9px] font-mono tracking-wider font-extrabold text-slate-400 uppercase">Kategori</label>
+                <select id="expense-category" class="w-full bg-slate-950 border border-white/10 px-3 py-2 rounded-lg text-xs text-white outline-none focus:border-emerald-400/50">
+                  <option value="Kebutuhan">Kebutuhan Pokok</option>
+                  <option value="Keinginan">Keinginan (Wishlist)</option>
+                </select>
+              </div>
+              
+              <div class="space-y-1">
+                <label class="text-[9px] font-mono tracking-wider font-extrabold text-slate-400 uppercase">Tipe</label>
+                <select id="expense-type" class="w-full bg-slate-950 border border-white/10 px-3 py-2 rounded-lg text-xs text-white outline-none focus:border-emerald-400/50">
+                  <option value="Sekali">Sekali (Bulan ini saja)</option>
+                  <option value="Rutin">Rutin (Tiap bulan ke depan)</option>
+                </select>
+              </div>
+
+              <button id="btn-save-expense" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-black uppercase text-xs tracking-wider rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] mt-2 cursor-pointer flex items-center justify-center gap-2">
+                <i class="fa-solid fa-check"></i> Accept
+              </button>
+            </div>
+          </div>
+        </div>
       </main>
 
     </div>

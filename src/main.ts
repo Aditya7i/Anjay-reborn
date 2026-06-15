@@ -38,103 +38,7 @@ function getAudioContext() {
 }
 
 function playAudioAlert(type: 'success' | 'info' | 'warning' | 'error', volumePercent: number) {
-  try {
-    const ctx = getAudioContext();
-    if (ctx.state === 'suspended') {
-      ctx.resume();
-    }
-
-    const masterGain = ctx.createGain();
-    masterGain.gain.setValueAtTime((volumePercent / 100) * 0.15, ctx.currentTime);
-    masterGain.connect(ctx.destination);
-
-    const now = ctx.currentTime;
-
-    if (type === 'success') {
-      // SUCCESS: Harmonious double rising tones (Sinusoidal)
-      const osc1 = ctx.createOscillator();
-      const osc2 = ctx.createOscillator();
-      osc1.type = 'sine';
-      osc2.type = 'sine';
-
-      osc1.frequency.setValueAtTime(587.33, now); // D5
-      osc1.frequency.exponentialRampToValueAtTime(880.00, now + 0.15); // A5
-
-      osc2.frequency.setValueAtTime(587.33 * 1.25, now + 0.05);
-      osc2.frequency.exponentialRampToValueAtTime(880.00 * 1.25, now + 0.2);
-
-      const gain1 = ctx.createGain();
-      const gain2 = ctx.createGain();
-      gain1.gain.setValueAtTime(0.5, now);
-      gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-      gain2.gain.setValueAtTime(0.5, now + 0.05);
-      gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-
-      osc1.connect(gain1);
-      gain1.connect(masterGain);
-      osc2.connect(gain2);
-      gain2.connect(masterGain);
-
-      osc1.start(now);
-      osc1.stop(now + 0.25);
-      osc2.start(now + 0.05);
-      osc2.stop(now + 0.3);
-
-    } else if (type === 'info') {
-      // INFO: Gentle ambient triangle wave
-      const osc = ctx.createOscillator();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(440.00, now); // A4
-      osc.frequency.exponentialRampToValueAtTime(554.37, now + 0.2); // C#5
-
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.6, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-
-      osc.connect(gain);
-      gain.connect(masterGain);
-
-      osc.start(now);
-      osc.stop(now + 0.3);
-
-    } else if (type === 'warning') {
-      // WARNING: Modulated square wave vibrant pulse
-      const osc = ctx.createOscillator();
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(220.00, now); // A3
-      osc.frequency.setValueAtTime(233.08, now + 0.08); // Bb3
-      osc.frequency.setValueAtTime(220.00, now + 0.16);
-
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.4, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.24);
-
-      osc.connect(gain);
-      gain.connect(masterGain);
-
-      osc.start(now);
-      osc.stop(now + 0.26);
-
-    } else if (type === 'error') {
-      // ERROR: Sad falling low saw wave sliding pitch
-      const osc = ctx.createOscillator();
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(130.00, now); // C3
-      osc.frequency.exponentialRampToValueAtTime(80.00, now + 0.35);
-
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.7, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-
-      osc.connect(gain);
-      gain.connect(masterGain);
-
-      osc.start(now);
-      osc.stop(now + 0.45);
-    }
-  } catch (e) {
-    console.warn("Synthesizer failed to execute sound:", e);
-  }
+  // Suara default dihilangkan sesuai permintaan
 }
 
 // Floating Spawn toast notifications trigger function
@@ -445,6 +349,101 @@ function setupWasmSimulationFallbacks() {
       return JSON.stringify({ success: true, message: "Profil berhasil diperbarui!", user: { username: newUsername, email, avatar } });
     };
   }
+
+  // --- MOCK FINANCIAL FUNCTION BACKEND ---
+  if (!window.go_fmg_get_state) {
+    let mockFmgMonths = ["Bulan 1", "Bulan 2", "Bulan 3", "Bulan 4", "Bulan 5", "Bulan 6"];
+    let mockFmgRecords: any = {};
+    for (let m of mockFmgMonths) {
+      mockFmgRecords[m] = {
+        monthName: m,
+        income: 0,
+        expenses: [],
+        totalExpense: 0,
+        savings: 0,
+        grade: "-",
+        advice: "Silakan masukkan data keuangan Anda"
+      };
+    }
+    let mockFmgIndex = 0;
+
+    const calculateFmgScore = () => {
+      let streak = 0;
+      for (let m of mockFmgMonths) {
+        let rec = mockFmgRecords[m];
+        let totExpense = rec.expenses.reduce((s: number, ex: any) => s + ex.amount, 0);
+        rec.totalExpense = totExpense;
+        rec.savings = rec.income - totExpense;
+
+        if (rec.income <= 0 && rec.expenses.length === 0) {
+          rec.grade = "-";
+          rec.advice = "Silakan masukkan data keuangan Anda";
+          streak = 0;
+          continue;
+        }
+
+        if (rec.income <= 0) {
+          rec.grade = "D";
+          rec.advice = "Ayo tingkatkan lagi kedisiplinan finansialnya";
+          streak = 0;
+          continue;
+        }
+
+        let pct = (rec.savings / rec.income) * 100;
+        let pctScore = pct < 25 ? 20 : (pct <= 30 ? 30 : (pct <= 40 ? 40 : 50));
+        
+        if (rec.savings > 0) streak++;
+        else streak = 0;
+        
+        let consScore = streak >= 6 ? 50 : (streak >= 4 ? 40 : (streak >= 2 ? 30 : 0));
+        let finalScore = pctScore + consScore;
+        
+        if (finalScore <= 40) { rec.grade = "D"; rec.advice = "Ayo tingkatkan lagi kedisiplinan finansialnya"; }
+        else if (finalScore <= 60) { rec.grade = "C"; rec.advice = "Bagus, lebih di tingkatkan lagi yuk"; }
+        else if (finalScore <= 80) { rec.grade = "B"; rec.advice = "Semangat...!!! bulan depan harus grade A"; }
+        else { rec.grade = "A"; rec.advice = "Pertahankan, kamu sudah pandai mengelola keuangan"; }
+      }
+    };
+
+    const getFmgStateJson = () => {
+      calculateFmgScore();
+      return JSON.stringify({
+        currentMonthIndex: mockFmgIndex,
+        records: mockFmgMonths.map(m => mockFmgRecords[m])
+      });
+    };
+
+    window.go_fmg_get_state = () => getFmgStateJson();
+
+    window.go_fmg_set_income = (val: number) => {
+      mockFmgRecords[mockFmgMonths[mockFmgIndex]].income += val;
+      return getFmgStateJson();
+    };
+
+    window.go_fmg_next_month = () => {
+      if (mockFmgIndex < mockFmgMonths.length - 1) mockFmgIndex++;
+      return getFmgStateJson();
+    };
+
+    window.go_fmg_add_expense = (jsonStr: string) => {
+      let obj = JSON.parse(jsonStr);
+      if (obj.type === "Rutin") {
+        for (let i = mockFmgIndex; i < mockFmgMonths.length; i++) {
+          mockFmgRecords[mockFmgMonths[i]].expenses.push({...obj, type: "Rutin"});
+        }
+      } else {
+        mockFmgRecords[mockFmgMonths[mockFmgIndex]].expenses.push(obj);
+      }
+      return getFmgStateJson();
+    };
+
+    window.go_fmg_delete_expense = (id: string) => {
+      for (let m of mockFmgMonths) {
+        mockFmgRecords[m].expenses = mockFmgRecords[m].expenses.filter((e: any) => e.id !== id);
+      }
+      return getFmgStateJson();
+    };
+  }
 }
 
 // Invoke the setup immediately
@@ -517,32 +516,7 @@ const DEFAULT_LYRICS_3 = `[00:00.00] (Sintesis kosmik - Keheningan galaksi)
 [00:28.00] Selesaikan kompilasi, raih kebahagiaan sejati
 [00:34.00] (Tuning frekuensi - Keluar dari orbit)`;
 
-const seededDefaultTracks: EmbeddedTrack[] = [
-  {
-    id: 'lofi-track-1',
-    title: 'Resonansi Logbook WebAssembly',
-    artist: 'The Gopher Loops',
-    lyrics: DEFAULT_LYRICS_1,
-    coverPreset: 'g-cyber',
-    isProcedural: true
-  },
-  {
-    id: 'lofi-track-2',
-    title: 'Hening Sandi Malam',
-    artist: 'Neon Cyber',
-    lyrics: DEFAULT_LYRICS_2,
-    coverPreset: 'g-rose',
-    isProcedural: true
-  },
-  {
-    id: 'lofi-track-3',
-    title: 'Langkah Kosmik',
-    artist: 'Vibe Gopher',
-    lyrics: DEFAULT_LYRICS_3,
-    coverPreset: 'g-emerald',
-    isProcedural: true
-  }
-];
+const seededDefaultTracks: EmbeddedTrack[] = [];
 
 // Continuous audio states
 const bgAudioNode = new Audio();
@@ -870,6 +844,24 @@ function setDashboardSessionActive(user: UserSession) {
   document.getElementById('auth-screen')?.classList.add('hidden');
   document.getElementById('main-dashboard')?.classList.remove('hidden');
 
+  const btnLogout = document.getElementById('btn-user-logout');
+  if (btnLogout) {
+    btnLogout.classList.remove('hidden');
+    btnLogout.onclick = () => {
+      localStorage.removeItem('user_session');
+      session = null;
+      document.getElementById('main-dashboard')?.classList.add('hidden');
+      document.getElementById('auth-screen')?.classList.remove('hidden');
+      btnLogout.classList.add('hidden');
+      window.spawnToast?.('info', 'Berhasil Keluar', 'Anda telah keluar dari sesi.');
+      
+      // Stop media playing when logout
+      if (typeof pausePlayingMusicTrack === 'function') {
+        pausePlayingMusicTrack();
+      }
+    };
+  }
+
   // Update user visual layout tags
   const avatarEl = document.getElementById('user-profile-avatar');
   const nameEl = document.getElementById('user-profile-name');
@@ -1161,6 +1153,8 @@ function registerDOMEventHandlers() {
         document.getElementById('panel-player')?.classList.remove('hidden');
       } else if (targetTab === 'tab-panel-settings') {
         document.getElementById('panel-settings')?.classList.remove('hidden');
+      } else if (targetTab === 'tab-panel-keuangan') {
+        document.getElementById('panel-keuangan')?.classList.remove('hidden');
       }
     });
   });
@@ -1563,6 +1557,15 @@ function registerDOMEventHandlers() {
     executeNextAudioTrack(false);
   });
 
+  // Carousel Next/Prev triggers
+  document.getElementById('btn-carousel-prev')?.addEventListener('click', () => {
+    executePrevAudioTrack();
+  });
+
+  document.getElementById('btn-carousel-next')?.addEventListener('click', () => {
+    executeNextAudioTrack(false);
+  });
+
   // Shuffle & Repeat toggles
   document.getElementById('btn-music-shuffle')?.addEventListener('click', () => {
     isShuffleMode = !isShuffleMode;
@@ -1635,14 +1638,48 @@ function registerDOMEventHandlers() {
   // File selected trigger label update
   const addTrackFileField = document.getElementById('add-track-file') as HTMLInputElement;
   const addTrackFileLabel = document.getElementById('add-track-file-label');
+  const addTrackTitleInput = document.getElementById('add-track-title') as HTMLInputElement;
+  
   addTrackFileField?.addEventListener('change', () => {
     if (addTrackFileField.files && addTrackFileField.files.length > 0) {
+      const file = addTrackFileField.files[0];
       if (addTrackFileLabel) {
-        addTrackFileLabel.textContent = `TERPILIH: ${addTrackFileField.files[0].name.toUpperCase()}`;
+        addTrackFileLabel.textContent = `TERPILIH: ${file.name.toUpperCase()}`;
+      }
+      if (addTrackTitleInput) {
+         // Auto fill title with file name without extension
+         const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+         addTrackTitleInput.value = nameWithoutExt;
       }
     } else {
       if (addTrackFileLabel) {
         addTrackFileLabel.textContent = 'PILIH FILE MP3...';
+      }
+    }
+  });
+
+  const addLyricsFileField = document.getElementById('add-track-lyrics-file') as HTMLInputElement;
+  const addLyricsFileLabel = document.getElementById('add-track-lyrics-label');
+  const addLyricsTextArea = document.getElementById('add-track-lyrics') as HTMLTextAreaElement;
+  addLyricsFileField?.addEventListener('change', () => {
+    if (addLyricsFileField.files && addLyricsFileField.files.length > 0) {
+      const file = addLyricsFileField.files[0];
+      if (addLyricsFileLabel) {
+        addLyricsFileLabel.textContent = `TERPILIH: ${file.name.toUpperCase()}`;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (addLyricsTextArea) {
+          addLyricsTextArea.value = (e.target?.result as string) || '';
+        }
+      };
+      reader.readAsText(file);
+    } else {
+      if (addLyricsFileLabel) {
+        addLyricsFileLabel.textContent = 'TIDAK ADA LIRIK (PILIH FILE)';
+      }
+      if (addLyricsTextArea) {
+        addLyricsTextArea.value = '';
       }
     }
   });
@@ -1709,8 +1746,8 @@ function registerDOMEventHandlers() {
     const inputLyrics = document.getElementById('add-track-lyrics') as HTMLTextAreaElement;
 
     const title = inputTitle?.value?.trim();
-    const artist = inputArtist?.value?.trim() || 'Synth Gopher';
-    const lyrics = inputLyrics?.value?.trim() || 'Lirik instrumental...';
+    const artist = inputArtist?.value?.trim() || 'No Artist';
+    const lyrics = inputLyrics?.value?.trim() || 'No lyrics avaiable.';
 
     if (!title) {
       window.spawnToast?.('warning', 'Judul Kosong', 'Harap masukkan judul lagu sebelum mendaftarkan trek!');
@@ -2282,33 +2319,130 @@ function renderTrackLyrics(track: EmbeddedTrack) {
   const scroller = document.getElementById('lyrics-display-scroller');
   if (!scroller) return;
   
+  if (!track.lyrics) {
+      scroller.innerHTML = '<div class="text-center font-mono text-slate-500 py-10 mt-10">No Lyrics available</div>';
+      return;
+  }
+
   const parsed = parseLyrics(track.lyrics);
   currentParsedLyrics = parsed;
   
   if (parsed.length === 0) {
-    scroller.innerHTML = `
-      <div class="text-slate-500 text-xs font-mono py-16 text-left ml-8 sm:ml-12">
-        Tidak ada lirik terpasang pada trek ini.
-      </div>
-    `;
+    scroller.innerHTML = '<div class="text-center font-mono text-slate-500 py-10 mt-10">No Lyrics available</div>';
     return;
   }
   
-  scroller.innerHTML = parsed.map((item, idx) => {
+  // Padding spacer start
+  let htmlResult = `<div class="h-24"></div>`;
+
+  htmlResult += parsed.map((item, idx) => {
     return `
-      <p id="lyric-line-${idx}" class="lyric-line ml-12 sm:ml-16 text-[15px] sm:text-xl font-medium text-slate-400 transition-all duration-300 select-none py-2 transform hover:translate-x-2 cursor-pointer" onclick="window.seekToLyricTime(${item.time})">
+      <p id="lyric-line-${idx}" class="lyric-line text-center text-[15px] sm:text-[18px] font-medium text-slate-400/70 transition-all duration-300 select-none py-3 transform cursor-pointer" onclick="window.seekToLyricTime(${item.time})">
         ${item.text}
       </p>
     `;
   }).join('');
   
+  // Padding spacer end
+  htmlResult += `<div class="h-32"></div>`;
+
+  scroller.innerHTML = htmlResult;
   scroller.scrollTop = 0;
+}
+
+const defaultMusicImagesGlob = import.meta.glob('/src/def-img-music/*.jpg', { eager: true, query: '?url', import: 'default' });
+const defaultMusicImagesList = Object.values(defaultMusicImagesGlob) as string[];
+
+function getTrackImageUrl(track: EmbeddedTrack) {
+  const directImagePath = `src/def-img-music/${track.title}.jpg`;
+  
+  // Use sequential indexing based on track ID hash so it's consistent
+  const consistentIndex = track.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const fallbackPath = defaultMusicImagesList.length > 0 
+    ? defaultMusicImagesList[consistentIndex % defaultMusicImagesList.length]
+    : 'src/def-img-music/defaults.jpg';
+    
+  return { directImagePath, fallbackPath };
+}
+
+function render3DCarousel() {
+  const stage = document.getElementById('music-3d-stage');
+  if (!stage) return;
+
+  if (activeTracksList.length === 0) {
+    stage.innerHTML = `
+      <div class="text-slate-500 text-xs italic text-center py-8">
+        Belum ada lagu terdaftar
+      </div>
+    `;
+    return;
+  }
+
+  let activeIndex = activeTracksList.findIndex(t => t.id === musicPlayingTrackId);
+  if (activeIndex === -1) {
+    activeIndex = 0;
+  }
+
+  // Generate perspective cards
+  const cardsHtml = activeTracksList.map((track, i) => {
+    const isPlaying = musicPlayingTrackId === track.id;
+    const offset = i - activeIndex;
+    const absOffset = Math.abs(offset);
+
+    // Limit visibility for clean look
+    if (absOffset > 2) {
+      return '';
+    }
+
+    let coverStyle = '';
+    if (track.coverPreset === 'g-rose') coverStyle = 'from-rose-500 to-amber-500';
+    else if (track.coverPreset === 'g-emerald') coverStyle = 'from-emerald-400 to-teal-700';
+    else if (track.coverPreset === 'g-cyber') coverStyle = 'from-purple-600 to-blue-500';
+    else coverStyle = 'from-slate-700 via-slate-800 to-neutral-900';
+
+    const pointerEvents = absOffset <= 1 ? 'auto' : 'none';
+    const opacity = absOffset === 0 ? '1' : absOffset === 1 ? '0.6' : '0.15';
+    
+    // Scale down inactive cards smoothly
+    const scale = 1 - absOffset * 0.15;
+    // Rotate cards facing inward slightly
+    const rotateY = offset * -25;
+    // Translate cards outwards
+    const translateX = offset * 105;
+    const translateZ = absOffset * -60;
+
+    const transformStyle = `
+      pointer-events: ${pointerEvents};
+      opacity: ${opacity};
+      z-index: ${100 - absOffset};
+      transform: translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale});
+    `;
+
+    const { directImagePath, fallbackPath } = getTrackImageUrl(track);
+    const bgFilter = isPlaying ? (musicPlayingState ? 'none' : 'brightness(80%)') : 'grayscale(50%) brightness(50%)';
+
+    const glowClass = isPlaying 
+      ? 'shadow-[0_15px_40px_rgba(16,185,129,0.3)] ring-2 ring-emerald-400/50' 
+      : 'shadow-xl ring-1 ring-white/10';
+
+    return `
+      <div class="absolute w-40 h-40 sm:w-56 sm:h-56 rounded-[24px] cursor-pointer transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] flex flex-col items-center justify-center group select-none overflow-hidden ${glowClass}"
+           style="${transformStyle}"
+           onclick="window.musicPlaySelectedTrackAction('${track.id}')">
+        
+        <!-- Clean minimalist cover image only -->
+        <img src="${directImagePath}" onerror="this.onerror=null; this.src='${fallbackPath}';" class="absolute inset-0 w-full h-full object-cover transition-all duration-500 pointer-events-none" style="filter: ${bgFilter};" />
+        
+      </div>
+    `;
+  }).join('');
+
+  stage.innerHTML = cardsHtml;
 }
 
 function renderActivePlayerVisuals() {
   const textTitle = document.getElementById('music-track-title');
   const textArtist = document.getElementById('music-track-artist');
-  const artworkDisc = document.getElementById('music-disc-artwork');
   const btnPlay = document.getElementById('btn-music-play');
   const sourceBadge = document.getElementById('music-source-badge');
   const lyricsStatusBadge = document.getElementById('music-lyrics-status-badge');
@@ -2345,29 +2479,25 @@ function renderActivePlayerVisuals() {
     lyricsStatusBadge.textContent = activeTrack ? 'Lirik Aktif' : 'Musik Saja';
   }
 
-  if (artworkDisc) {
-    artworkDisc.className = "w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center relative shadow-2xl overflow-hidden transition-all duration-300 shrink-0 border border-white/10";
-    
-    if (activeTrack) {
-      if (activeTrack.coverPreset === 'g-rose') {
-        artworkDisc.classList.add('bg-gradient-to-br', 'from-rose-500', 'to-amber-500');
-      } else if (activeTrack.coverPreset === 'g-emerald') {
-        artworkDisc.classList.add('bg-gradient-to-br', 'from-emerald-400', 'to-teal-700');
-      } else if (activeTrack.coverPreset === 'g-cyber') {
-        artworkDisc.classList.add('bg-gradient-to-br', 'from-purple-600', 'to-blue-500');
-      } else {
-        artworkDisc.classList.add('bg-gradient-to-br', 'from-slate-940', 'to-neutral-800');
-      }
-    } else {
-      artworkDisc.classList.add('bg-gradient-to-br', 'from-rose-500', 'via-purple-600', 'to-indigo-600');
-    }
+  // Draw/update 3D rotating carousel cards!
+  render3DCarousel();
 
-    if (musicPlayingState) {
-      artworkDisc.classList.add('animate-spin');
-      artworkDisc.style.animationDuration = '12s';
-    } else {
-      artworkDisc.classList.remove('animate-spin');
+  const blurredBg = document.getElementById('music-blurred-bg');
+  if (blurredBg) {
+    let imageUrl = 'src/def-img-music/defaults.jpg';
+    let fallbackImageUrl = 'src/def-img-music/defaults.jpg';
+    if (activeTrack) {
+       const imgData = getTrackImageUrl(activeTrack);
+       imageUrl = imgData.directImagePath;
+       fallbackImageUrl = imgData.fallbackPath;
     }
+    
+    // We add multiple fallbacks in the backgroundImage. If the first fails, CSS won't automatically fallback unless using image-set, but we can set the fallback as a secondary background. And if we use multiple backgrounds, they stack.
+    // Wait, CSS background-image multiple URLs just stacks them. So the first one is on top. If the first one gets a 404, it might be transparent.
+    // So the best approach here is just to set a solid color or let CSS use the dynamically resolved ones. But actually, we can just use the fallbackImageUrl if the direct fails. But since we cannot rely on onerror for CSS background, we can just set the CSS background to dynamically resolved `fallbackImageUrl` or `imageUrl`. 
+    // Ideally, we'd update this blurred bg *after* the img successfully loads or fails, but we don't have that plumbing.
+    // Let's just stack them: `url('${imageUrl}'), url('${fallbackImageUrl}')`. The browser will render both, if the first is 404, it's transparent, and the second one shows.
+    blurredBg.style.backgroundImage = `url('${imageUrl}'), url('${fallbackImageUrl}')`;
   }
 
   if (activeTrack) {
@@ -2375,11 +2505,7 @@ function renderActivePlayerVisuals() {
   } else {
     const scroller = document.getElementById('lyrics-display-scroller');
     if (scroller) {
-      scroller.innerHTML = `
-        <div class="text-slate-500 text-xs font-mono py-16 text-left ml-8 sm:ml-12">
-          Lirik lagu akan tampil otomatis saat trek audio dimainkan.
-        </div>
-      `;
+      scroller.innerHTML = '';
     }
   }
 }
@@ -2676,9 +2802,9 @@ function highlightLyricsAt(currentTime: number) {
     const el = document.getElementById(`lyric-line-${idx}`);
     if (el) {
       if (idx === activeIdx) {
-        el.className = 'lyric-line ml-12 sm:ml-16 text-lg sm:text-2xl font-black text-emerald-400 py-2.5 transition-all duration-150 cursor-pointer scale-105 select-none text-glow-secondary';
+        el.className = 'lyric-line text-center text-lg sm:text-[22px] font-black text-emerald-400 py-3 transition-all duration-300 cursor-pointer scale-105 select-none text-glow-secondary drop-shadow-md';
       } else {
-        el.className = 'lyric-line ml-12 sm:ml-16 text-[15px] sm:text-xl font-medium text-slate-400 py-2 transition-all duration-150 cursor-pointer opacity-60 hover:opacity-100 hover:text-white select-none hover:translate-x-2 transform';
+        el.className = 'lyric-line text-center text-[15px] sm:text-[18px] font-medium text-slate-400/50 py-3 transition-all duration-300 cursor-pointer hover:text-white select-none transform hover:scale-105';
       }
     }
   });
@@ -2950,6 +3076,36 @@ const defaultSampleTasks: UserTask[] = [
   { id: 't3', title: 'Menulis Jurnal Logbook Mingguan', date: '2026-06-01', priority: 'Low', completed: false }
 ];
 
+function setupNotificationPolling() {
+  const notifiedTasks = new Set<string>();
+
+  // Run a periodic check to remind for due tasks (every 1 minute)
+  setInterval(() => {
+    if (Notification.permission === 'granted') {
+      const todayDate = new Date().toISOString().split('T')[0];
+      const pendingToday = userTasks.filter(t => !t.completed && t.date === todayDate && !notifiedTasks.has(t.id));
+
+      if (pendingToday.length > 0) {
+        pendingToday.forEach(t => notifiedTasks.add(t.id));
+        new Notification("WASM Todo Reminder 📋", {
+          body: `Anda memiliki ${pendingToday.length} tugas yang belum selesai hari ini, contohnya: "${pendingToday[0].title}".`
+        });
+      }
+    }
+  }, 60000);
+
+  // If already active, show a brief initial summary once per session load
+  if (Notification.permission === 'granted' && !sessionStorage.getItem('has_notified_on_load')) {
+    const pendingCount = userTasks.filter(t => !t.completed).length;
+    if (pendingCount > 0) {
+      new Notification("WASM Todo Engine ⚡", {
+        body: `Sistem sedang berjalan. Anda memiliki ${pendingCount} tugas tertunda di agenda.`
+      });
+    }
+    sessionStorage.setItem('has_notified_on_load', 'true');
+  }
+}
+
 function initializeTugasFeatures() {
   // Load tasks
   const stored = localStorage.getItem('user_tasks');
@@ -2964,6 +3120,44 @@ function initializeTugasFeatures() {
     localStorage.setItem('user_tasks', JSON.stringify(userTasks));
   }
   
+  // --- Notifications Implementation UI ---
+  const btnReqNotif = document.getElementById('btn-request-notification');
+  if (btnReqNotif) {
+    if ("Notification" in window) {
+      if (Notification.permission === 'granted') {
+        btnReqNotif.innerHTML = `<i class="fa-solid fa-bell text-emerald-400"></i> Notifikasi Aktif`;
+        btnReqNotif.className = "flex items-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 p-2 rounded-xl border border-emerald-500/20 text-xs font-mono transition-all cursor-default pointer-events-none";
+        setupNotificationPolling();
+      } else if (Notification.permission === 'denied') {
+        btnReqNotif.innerHTML = `<i class="fa-solid fa-bell-slash text-rose-400"></i> Izin Ditolak`;
+        btnReqNotif.className = "flex items-center gap-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 p-2 rounded-xl border border-rose-500/20 text-xs font-mono transition-all cursor-default pointer-events-none";
+      }
+
+      btnReqNotif.addEventListener('click', async () => {
+        try {
+          const permission = await Notification.requestPermission();
+          if (permission === "granted") {
+            btnReqNotif.innerHTML = `<i class="fa-solid fa-bell text-emerald-400"></i> Notifikasi Aktif`;
+            btnReqNotif.className = "flex items-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 p-2 rounded-xl border border-emerald-500/20 text-xs font-mono transition-all cursor-default pointer-events-none";
+            window.spawnToast?.('success', 'Izin Diberikan 🔔', 'Anda akan menerima pengingat prioritas untuk tugas Anda.');
+            new Notification("✅ Gopher WASM System", {
+              body: "Push notification web berhasil diaktifkan dengan aman. Sistem akan mengingatkan agenda harian Anda."
+            });
+            setupNotificationPolling();
+          } else {
+            btnReqNotif.innerHTML = `<i class="fa-solid fa-bell-slash text-rose-400"></i> Izin Ditolak`;
+            btnReqNotif.className = "flex items-center gap-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 p-2 rounded-xl border border-rose-500/20 text-xs font-mono transition-all cursor-default pointer-events-none";
+            window.spawnToast?.('error', 'Izin Ditolak', 'Notifikasi saat ini diblokir oleh browser.');
+          }
+        } catch (err) {
+          console.error('Notification Setup Error', err);
+        }
+      });
+    } else {
+      btnReqNotif.style.display = 'none'; // hide if not supported
+    }
+  }
+
   // Bind Tasks creation buttons
   const btnAddTask = document.getElementById('tugas-btn-add');
   const inputTitle = document.getElementById('tugas-input-title') as HTMLInputElement;
@@ -3278,3 +3472,248 @@ let isSimpleDark = true;
   
   (window as any).spawnToast?.('info', 'Theme Toggled', isSimpleDark ? 'Dark Mode Aktif' : 'Light Mode Aktif');
 };
+
+// =========================================================================
+// FINANCIAL MODULE - GOLANG WASM BINDINGS
+// =========================================================================
+
+let financialData: any = null;
+
+function fetchFinancialState() {
+  if (typeof (window as any).go_fmg_get_state === 'function') {
+    const raw = (window as any).go_fmg_get_state();
+    financialData = JSON.parse(raw);
+  } else {
+    setTimeout(fetchFinancialState, 100);
+  }
+}
+
+function initFinancialModule() {
+  if (typeof (window as any).go_fmg_get_state === 'function') {
+    const raw = (window as any).go_fmg_get_state();
+    financialData = JSON.parse(raw);
+  } else {
+    setTimeout(initFinancialModule, 200);
+    return;
+  }
+
+  const incomeInput = document.getElementById('financial-income-input') as HTMLInputElement;
+
+  document.getElementById('btn-save-income')?.addEventListener('click', () => {
+    if (incomeInput && typeof (window as any).go_fmg_set_income === 'function') {
+      const val = parseFloat(incomeInput.value) || 0;
+      if (val > 0) {
+        const raw = (window as any).go_fmg_set_income(val);
+        financialData = JSON.parse(raw);
+        incomeInput.value = ''; // clear input
+        renderFinancialModule();
+        (window as any).spawnToast?.('success', 'Pemasukan Ditambahkan', 'Pemasukan berhasil ditambahkan.');
+      }
+    }
+  });
+
+  document.getElementById('btn-financial-next-month')?.addEventListener('click', () => {
+    if (typeof (window as any).go_fmg_next_month === 'function') {
+      const raw = (window as any).go_fmg_next_month();
+      financialData = JSON.parse(raw);
+      renderFinancialModule();
+      (window as any).spawnToast?.('info', 'Bulan Baru', 'Bulan telah berganti.');
+    }
+  });
+
+  const modalAddExpense = document.getElementById('modal-add-expense');
+  document.getElementById('btn-open-expense-modal')?.addEventListener('click', () => {
+    (window as any).financialEditingId = null;
+    (document.getElementById('expense-name') as HTMLInputElement).value = '';
+    (document.getElementById('expense-amount') as HTMLInputElement).value = '';
+    const typeEl = document.getElementById('expense-type') as HTMLSelectElement;
+    typeEl.disabled = false;
+    if (modalAddExpense) {
+      modalAddExpense.classList.remove('opacity-0', 'pointer-events-none');
+      modalAddExpense.querySelector('.large-card')?.classList.add('scale-100');
+    }
+  });
+
+  document.getElementById('btn-close-expense-modal')?.addEventListener('click', () => {
+    if (modalAddExpense) {
+      modalAddExpense.classList.add('opacity-0', 'pointer-events-none');
+    }
+  });
+
+  document.getElementById('btn-save-expense')?.addEventListener('click', () => {
+    const nameEl = document.getElementById('expense-name') as HTMLInputElement;
+    const amountEl = document.getElementById('expense-amount') as HTMLInputElement;
+    const categoryEl = document.getElementById('expense-category') as HTMLSelectElement;
+    const typeEl = document.getElementById('expense-type') as HTMLSelectElement;
+
+    if (!nameEl.value || !amountEl.value) {
+      (window as any).spawnToast?.('warning', 'Data tidak lengkap', 'Harap isi nama dan nominal pengeluaran.');
+      return;
+    }
+
+    if (typeof (window as any).go_fmg_add_expense === 'function') {
+      // Create JSON payload
+      const obj = {
+        id: "exp_" + Date.now(),
+        name: nameEl.value,
+        category: categoryEl.value,
+        type: typeEl.value,
+        amount: parseFloat(amountEl.value)
+      };
+      
+      const raw = (window as any).go_fmg_add_expense(JSON.stringify(obj));
+      financialData = JSON.parse(raw);
+      (window as any).spawnToast?.('success', 'Pengeluaran Dicatat', `Berhasil menambahkan ${obj.name} ke modul finansial.`);
+    }
+    
+    nameEl.value = '';
+    amountEl.value = '';
+    typeEl.disabled = false;
+    if (modalAddExpense) {
+      modalAddExpense.classList.add('opacity-0', 'pointer-events-none');
+    }
+    
+    renderFinancialModule();
+  });
+
+  renderFinancialModule();
+}
+
+// Custom handler attached to window for string binding from HTML buttons
+(window as any).financialDelete = function(id: string) {
+  if (typeof (window as any).go_fmg_delete_expense === 'function') {
+    const raw = (window as any).go_fmg_delete_expense(id);
+    financialData = JSON.parse(raw);
+    renderFinancialModule();
+    (window as any).spawnToast?.('success', 'Dihapus', 'Pengeluaran telah dihapus.');
+  }
+};
+
+function renderFinancialModule() {
+  if (!financialData) return;
+
+  const currentMonthIdx = financialData.currentMonthIndex;
+  const records = financialData.records;
+  const currentMonthData = records[currentMonthIdx];
+  
+  const elCurrentMonth = document.getElementById('financial-current-month');
+  if (elCurrentMonth) elCurrentMonth.innerText = currentMonthData.monthName.toUpperCase();
+
+  const totalIncomeLabel = document.getElementById('financial-total-income-label');
+  if (totalIncomeLabel) {
+    totalIncomeLabel.innerText = `$${currentMonthData.income.toLocaleString()}`;
+  }
+  
+  // Update Left Column
+  const listEl = document.getElementById('financial-expenses-list');
+  if (listEl) {
+    if (!currentMonthData.expenses || currentMonthData.expenses.length === 0) {
+      listEl.innerHTML = `
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-white/5 text-[9px] uppercase tracking-widest text-slate-500 font-mono">
+              <th class="py-2 font-medium">Nama/Category</th>
+              <th class="py-2 font-medium text-right">Nominal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="2" class="text-xs text-slate-500 text-center italic py-10">Belum ada data pengeluaran</td>
+            </tr>
+          </tbody>
+        </table>
+      `;
+    } else {
+      let rows = currentMonthData.expenses.map(ex => `
+        <tr class="border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors">
+          <td class="py-2.5 w-8 text-center relative group">
+            <button class="text-slate-400 hover:text-white px-2 py-1 relative">
+              <i class="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+            <div class="absolute left-0 top-full mt-1 w-36 bg-slate-800 border border-white/10 rounded-lg shadow-xl z-50 hidden group-hover:block text-left overflow-hidden">
+              <button onclick="window.financialDelete('${ex.id}')" class="w-full px-3 py-2 text-[10px] uppercase font-bold text-rose-400 hover:bg-rose-500/20 text-left transition-colors cursor-pointer border-b border-white/5">
+                <i class="fa-solid fa-trash w-4"></i> Hapus
+              </button>
+            </div>
+          </td>
+          <td class="py-2.5">
+            <p class="text-xs font-bold text-white truncate max-w-[120px] sm:max-w-[200px]">${ex.name}</p>
+            <p class="text-[9px] font-mono text-slate-400 mt-0.5">${ex.category} • ${ex.type}</p>
+          </td>
+          <td class="py-2.5 text-right">
+            <div class="text-rose-400 font-mono text-xs font-bold whitespace-nowrap">
+              -$${ex.amount.toLocaleString()}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+      
+      listEl.innerHTML = `
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-white/5 text-[9px] uppercase tracking-widest text-slate-500 font-mono">
+              <th class="py-2 font-medium w-8"></th>
+              <th class="py-2 font-medium">Nama/Category</th>
+              <th class="py-2 font-medium text-right">Nominal</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      `;
+    }
+  }
+
+  const elTotExp = document.getElementById('financial-total-expense');
+  if (elTotExp) elTotExp.innerText = `$${currentMonthData.totalExpense.toLocaleString()}`;
+
+  const elSavings = document.getElementById('financial-savings');
+  if (elSavings) elSavings.innerText = `$${currentMonthData.savings.toLocaleString()}`;
+
+  // Update Right Column
+  const gridEl = document.getElementById('financial-history-grid');
+  if (gridEl) {
+    const allRecords = financialData.records;
+    gridEl.innerHTML = allRecords.map((rec: any, i: number) => {
+      let gradeColor = 'text-slate-400';
+      if (rec.grade === 'A') gradeColor = 'text-emerald-400 text-glow-secondary';
+      else if (rec.grade === 'B') gradeColor = 'text-blue-400';
+      else if (rec.grade === 'C') gradeColor = 'text-amber-400';
+      else if (rec.grade === 'D') gradeColor = 'text-rose-400';
+      else if (rec.grade === '-') gradeColor = 'text-slate-500';
+
+      const isCurrent = i === financialData.currentMonthIndex;
+
+      return `
+        <div class="p-4 bg-slate-950/40 rounded-xl border ${isCurrent ? 'border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.15)] bg-emerald-500/5' : 'border-white/5'} space-y-2 relative overflow-hidden group hover:border-blue-500/30 transition-all">
+          <div class="flex justify-between items-center border-b ${isCurrent ? 'border-emerald-500/20' : 'border-white/5'} pb-2">
+            <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">${i === 0 ? 'Bulan Ini' : `Bulan Ke-${i+1}`} ${isCurrent ? '<i class="fa-solid fa-star text-emerald-400 ml-1"></i>' : ''}</span>
+            <span class="text-[10px] font-mono font-bold ${isCurrent ? 'text-emerald-400' : 'text-blue-400'}">${rec.monthName}</span>
+          </div>
+          
+          <div class="flex flex-col gap-1">
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-500">Sisa Uang:</span>
+              <span class="font-bold text-emerald-400">$${rec.savings.toLocaleString()}</span>
+            </div>
+            <div class="flex justify-between text-xs items-center">
+              <span class="text-slate-500">Grade:</span>
+              <span class="font-black text-xl ${gradeColor} font-display leading-none mt-1">${rec.grade}</span>
+            </div>
+            <div class="mt-2 pt-2 border-t ${isCurrent ? 'border-emerald-500/20 border-l-emerald-500/50' : 'border-white/5 border-l-blue-500/50'} text-[9px] text-slate-400 leading-relaxed italic border-l-2 pl-2">
+              Laporan: ${rec.advice}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+// Call on startup
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initFinancialModule);
+} else {
+  initFinancialModule();
+}

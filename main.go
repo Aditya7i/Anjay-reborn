@@ -505,6 +505,209 @@ func jsUpdateProfile(this js.Value, args []js.Value) interface{} {
 	return "{\"success\": true, \"message\": \"Profil berhasil diperbarui!\", \"user\": " + string(userJSON) + "}"
 }
 
+// --- MODUL KEUANGAN (FINANCIAL MODULE) --
+
+// Expense struct menyimpan rincian satuan pengeluaran
+type Expense struct {
+	ID       string  `json:"id"`
+	Name     string  `json:"name"`
+	Category string  `json:"category"` // "Kebutuhan" atau "Keinginan"
+	Type     string  `json:"type"`     // "Sekali" atau "Rutin"
+	Amount   float64 `json:"amount"`
+}
+
+// MonthlyRecord struct memegang rekaman bulan terkait
+type MonthlyRecord struct {
+	MonthName    string    `json:"monthName"`
+	Income       float64   `json:"income"`
+	Expenses     []Expense `json:"expenses"`
+	TotalExpense float64   `json:"totalExpense"`
+	Savings      float64   `json:"savings"`
+	Grade        string    `json:"grade"`
+	Advice       string    `json:"advice"`
+}
+
+// State Global Keuangan
+var financialMonths = []string{"Bulan 1", "Bulan 2", "Bulan 3", "Bulan 4", "Bulan 5", "Bulan 6"}
+var financialRecords = make(map[string]*MonthlyRecord)
+var currentMonthIndex = 0
+
+// initFinancialState mempersiapkan data di awal ketika kosong
+func initFinancialState() {
+	if len(financialRecords) == 0 {
+		for _, m := range financialMonths {
+			financialRecords[m] = &MonthlyRecord{
+				MonthName: m,
+				Income:    0,
+				Expenses:  make([]Expense, 0),
+				Grade:     "-",
+				Advice:    "Silakan masukkan data keuangan Anda",
+			}
+		}
+	}
+}
+
+// jsFinancialGetState mengembalikan state terbaru ke frontend
+func jsFinancialGetState(this js.Value, args []js.Value) interface{} {
+	initFinancialState()
+	calculateEngine()
+	
+	var resultList []*MonthlyRecord
+	for _, m := range financialMonths {
+		resultList = append(resultList, financialRecords[m])
+	}
+	
+	resp := map[string]interface{}{
+		"currentMonthIndex": currentMonthIndex,
+		"records": resultList,
+	}
+	res, _ := json.Marshal(resp)
+	return string(res)
+}
+
+// jsFinancialSetIncome memasukkan nominal pemasukan
+func jsFinancialSetIncome(this js.Value, args []js.Value) interface{} {
+	if len(args) < 1 { return nil }
+	initFinancialState()
+	income := args[0].Float()
+	activeMonth := financialMonths[currentMonthIndex]
+	financialRecords[activeMonth].Income += income
+	calculateEngine()
+	return jsFinancialGetState(this, nil)
+}
+
+// jsFinancialNextMonth menggeser ke bulan selanjutnya
+func jsFinancialNextMonth(this js.Value, args []js.Value) interface{} {
+	initFinancialState()
+	if currentMonthIndex < len(financialMonths)-1 {
+		currentMonthIndex++
+	}
+	calculateEngine()
+	return jsFinancialGetState(this, nil)
+}
+
+// jsFinancialAddExpense menyimpan pengeluaran, jika rutin direplikasi
+func jsFinancialAddExpense(this js.Value, args []js.Value) interface{} {
+	if len(args) < 1 { return nil }
+	initFinancialState()
+	dataStr := args[0].String()
+	var newExp Expense
+	json.Unmarshal([]byte(dataStr), &newExp)
+	
+	activeMonth := financialMonths[currentMonthIndex]
+	
+	if newExp.Type == "Rutin" {
+		for i := currentMonthIndex; i < len(financialMonths); i++ {
+			m := financialMonths[i]
+			financialRecords[m].Expenses = append(financialRecords[m].Expenses, newExp)
+		}
+	} else {
+		financialRecords[activeMonth].Expenses = append(financialRecords[activeMonth].Expenses, newExp)
+	}
+	
+	calculateEngine()
+	return jsFinancialGetState(this, nil)
+}
+
+// jsFinancialDeleteExpense menghapus rekaman pengeluaran
+func jsFinancialDeleteExpense(this js.Value, args []js.Value) interface{} {
+	if len(args) < 1 { return nil }
+	id := args[0].String()
+	
+	for i := 0; i < len(financialMonths); i++ {
+		m := financialMonths[i]
+		newExpList := make([]Expense, 0)
+		for _, e := range financialRecords[m].Expenses {
+			if e.ID != id {
+				newExpList = append(newExpList, e)
+			}
+		}
+		financialRecords[m].Expenses = newExpList
+	}
+	calculateEngine()
+	return jsFinancialGetState(this, nil)
+}
+
+// calculateEngine menghitung persentase tabungan, konsistensi skor dan grade 
+func calculateEngine() {
+	streak := 0
+	for _, mName := range financialMonths {
+		rec := financialRecords[mName]
+		
+		totalExp := 0.0
+		for _, e := range rec.Expenses {
+			totalExp += e.Amount
+		}
+		rec.TotalExpense = totalExp
+		rec.Savings = rec.Income - totalExp
+		
+		// Status belum ada input
+		if rec.Income <= 0 && len(rec.Expenses) == 0 {
+			rec.Grade = "-"
+			rec.Advice = "Silakan masukkan data keuangan Anda"
+			streak = 0
+			continue
+		}
+		
+		// Input belum memiliki pemasukan tapi ada pengeluaran
+		if rec.Income <= 0 {
+			rec.Grade = "D"
+			rec.Advice = "Ayo tingkatkan lagi kedisiplinan finansialnya"
+			streak = 0
+			continue
+		}
+		
+		// 1. Perhitungan Skor Persentase
+		savingsPct := (rec.Savings / rec.Income) * 100
+		percentageScore := 0
+		
+		if savingsPct < 25 {
+			percentageScore = 20
+		} else if savingsPct >= 25 && savingsPct <= 30 {
+			percentageScore = 30
+		} else if savingsPct > 30 && savingsPct <= 40 {
+			percentageScore = 40
+		} else if savingsPct > 50 {
+			percentageScore = 50
+		} else {
+			percentageScore = 40 
+		}
+		
+		// 2. Perhitungan Streak (Tabungan > 0 beruntun)
+		if rec.Savings > 0 {
+			streak++
+		} else {
+			streak = 0
+		}
+		
+		consistencyScore := 0
+		if streak >= 6 {
+			consistencyScore = 50
+		} else if streak >= 4 {
+			consistencyScore = 40
+		} else if streak >= 2 {
+			consistencyScore = 30
+		}
+		
+		// 3. Kalkulasi Poin Final
+		finalScore := percentageScore + consistencyScore
+		
+		if finalScore <= 40 {
+			rec.Grade = "D"
+			rec.Advice = "Ayo tingkatkan lagi kedisiplinan finansialnya"
+		} else if finalScore <= 60 {
+			rec.Grade = "C"
+			rec.Advice = "Bagus, lebih di tingkatkan lagi yuk"
+		} else if finalScore <= 80 {
+			rec.Grade = "B"
+			rec.Advice = "Semangat...!!! bulan depan harus grade A"
+		} else {
+			rec.Grade = "A"
+			rec.Advice = "Pertahankan, kamu sudah pandai mengelola keuangan"
+		}
+	}
+}
+
 func main() {
 	// Seed registered Gopher and Admin users
 	hPass := hashPassword("password123")
@@ -546,6 +749,11 @@ func main() {
 	js.Global().Set("go_init_sliding", js.FuncOf(jsInitSliding))
 	js.Global().Set("go_move_sliding", js.FuncOf(jsMoveSliding))
 	js.Global().Set("go_update_profile", js.FuncOf(jsUpdateProfile))
+	js.Global().Set("go_fmg_get_state", js.FuncOf(jsFinancialGetState))
+	js.Global().Set("go_fmg_set_income", js.FuncOf(jsFinancialSetIncome))
+	js.Global().Set("go_fmg_next_month", js.FuncOf(jsFinancialNextMonth))
+	js.Global().Set("go_fmg_add_expense", js.FuncOf(jsFinancialAddExpense))
+	js.Global().Set("go_fmg_delete_expense", js.FuncOf(jsFinancialDeleteExpense))
 
 	// Channel block to keep WASM running in background
 	<-c
